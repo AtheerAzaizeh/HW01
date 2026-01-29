@@ -186,6 +186,7 @@ const Support = () => {
                     sx={{ '&.Mui-selected': { bgcolor: 'rgba(255, 215, 0, 0.1)' } }}
                   >
                     <ListItemText
+                      secondaryTypographyProps={{ component: 'div' }}
                       primary={chat.subject}
                       secondary={
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
