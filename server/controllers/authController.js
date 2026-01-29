@@ -120,6 +120,7 @@ export const getMe = async (req, res, next) => {
           email: user.email,
           role: user.role,
           isAdmin: user.isAdmin,
+          avatar: user.avatar,
           createdAt: user.createdAt
         }
       }
@@ -134,12 +135,13 @@ export const getMe = async (req, res, next) => {
 // @access  Private
 export const updateProfile = async (req, res, next) => {
   try {
-    const { name, email } = req.body;
+    const { name, email, avatar } = req.body;
 
     const user = await User.findById(req.user.id);
 
     if (name) user.name = name;
     if (email) user.email = email;
+    if (avatar !== undefined) user.avatar = avatar;
 
     await user.save();
 
@@ -152,9 +154,43 @@ export const updateProfile = async (req, res, next) => {
           name: user.name,
           email: user.email,
           role: user.role,
-          isAdmin: user.isAdmin
+          isAdmin: user.isAdmin,
+          avatar: user.avatar
         }
       }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Delete own account
+// @route   DELETE /api/auth/account
+// @access  Private
+export const deleteAccount = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Prevent superadmins from deleting themselves (security measure)
+    if (user.role === 'superadmin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Superadmin accounts cannot be self-deleted'
+      });
+    }
+
+    await User.findByIdAndDelete(req.user.id);
+
+    res.status(200).json({
+      success: true,
+      message: 'Account deleted successfully'
     });
   } catch (error) {
     next(error);

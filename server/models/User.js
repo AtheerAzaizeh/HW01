@@ -28,6 +28,10 @@ const userSchema = new mongoose.Schema({
     enum: ['user', 'admin', 'superadmin'],
     default: 'user'
   },
+  avatar: {
+    type: String,
+    default: null
+  },
   // Keep isAdmin for backward compatibility
   isAdmin: {
     type: Boolean,

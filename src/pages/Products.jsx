@@ -1,6 +1,7 @@
 // src/pages/Products.jsx
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import {
   Container, Grid, Typography, Box, FormControl, InputLabel,
   Select, MenuItem, TextField, InputAdornment
@@ -18,12 +19,25 @@ import { useNotification } from '../context/NotificationContext';
 const Products = () => {
   const dispatch = useDispatch();
   const { notifySuccess } = useNotification();
+  const { search: urlSearch } = useLocation();
+  const searchParams = new URLSearchParams(urlSearch);
+  const initialCategory = searchParams.get('category') || '';
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [category, setCategory] = useState('');
+  const [category, setCategory] = useState(initialCategory);
   const [sort, setSort] = useState('');
   const [search, setSearch] = useState('');
+
+  // Update category when URL changes
+  useEffect(() => {
+    const params = new URLSearchParams(urlSearch);
+    const cat = params.get('category');
+    if (cat !== null) {
+      setCategory(cat);
+    }
+  }, [urlSearch]);
 
   // Fetch products
   useEffect(() => {
@@ -165,7 +179,7 @@ const Products = () => {
 
           <Grid container spacing={4}>
             {products.map((product) => (
-              <Grid item key={product._id} xs={12} sm={6} md={3}>
+              <Grid item key={product._id} xs={12} sm={6} md={4}>
                 <HoodieCard
                   hoodie={{
                     id: product._id,

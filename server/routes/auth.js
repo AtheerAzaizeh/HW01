@@ -1,7 +1,7 @@
 // server/routes/auth.js
 import express from 'express';
 import { body } from 'express-validator';
-import { register, login, getMe, updateProfile } from '../controllers/authController.js';
+import { register, login, getMe, updateProfile, deleteAccount } from '../controllers/authController.js';
 import { protect } from '../middleware/auth.js';
 import validate from '../middleware/validate.js';
 
@@ -36,5 +36,6 @@ router.post('/register', registerValidation, validate, register);
 router.post('/login', loginValidation, validate, login);
 router.get('/me', protect, getMe);
 router.put('/profile', protect, updateProfile);
+router.delete('/account', protect, deleteAccount);
 
 export default router;

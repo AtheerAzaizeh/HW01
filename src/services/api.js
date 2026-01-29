@@ -44,6 +44,8 @@ const api = {
       apiFetch('/auth/me'),
     updateProfile: (data) => 
       apiFetch('/auth/profile', { method: 'PUT', body: JSON.stringify(data) }),
+    deleteAccount: () => 
+      apiFetch('/auth/account', { method: 'DELETE' }),
   },
 
   // Products
