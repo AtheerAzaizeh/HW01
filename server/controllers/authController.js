@@ -45,7 +45,8 @@ export const register = async (req, res, next) => {
           name: user.name,
           email: user.email,
           role: user.role,
-          isAdmin: user.isAdmin
+          isAdmin: user.isAdmin,
+          avatar: user.avatar
         },
         token
       }
@@ -94,7 +95,8 @@ export const login = async (req, res, next) => {
           name: user.name,
           email: user.email,
           role: user.role,
-          isAdmin: user.isAdmin
+          isAdmin: user.isAdmin,
+          avatar: user.avatar
         },
         token
       }

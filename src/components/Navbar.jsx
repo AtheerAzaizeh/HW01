@@ -119,7 +119,7 @@ const Navbar = ({ themeMode, toggleTheme }) => {
         {isAuthenticated ? (
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-              <Avatar sx={{ bgcolor: '#FFD700', color: 'black', fontWeight: 'bold' }}>
+              <Avatar src={user?.avatar} sx={{ bgcolor: '#FFD700', color: 'black', fontWeight: 'bold' }}>
                 {user?.name?.charAt(0).toUpperCase()}
               </Avatar>
               <Box>
@@ -263,6 +263,7 @@ const Navbar = ({ themeMode, toggleTheme }) => {
                     }}
                   >
                     <Avatar 
+                      src={user?.avatar}
                       sx={{ 
                         width: 32, 
                         height: 32, 
