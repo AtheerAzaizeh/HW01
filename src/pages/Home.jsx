@@ -95,10 +95,29 @@ const Home = () => {
         }}
       >
         <Container>
-          <Typography variant="h2" sx={{ color: 'white', mb: 2, textTransform: 'uppercase', letterSpacing: '0.2em', fontWeight: 900 }}>
+          <Typography 
+            variant="h2" 
+            sx={{ 
+              color: 'white', 
+              mb: 2, 
+              textTransform: 'uppercase', 
+              letterSpacing: { xs: '0.1em', md: '0.2em' }, 
+              fontWeight: 900,
+              fontSize: { xs: '2rem', sm: '2.5rem', md: '3.75rem' }
+            }}
+          >
             Premium Hoodies
           </Typography>
-          <Typography variant="h6" sx={{ color: 'grey.300', mb: 4, fontWeight: 300 }}>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              color: 'grey.300', 
+              mb: 4, 
+              fontWeight: 300,
+              fontSize: { xs: '0.9rem', sm: '1rem', md: '1.25rem' },
+              px: { xs: 2, md: 0 }
+            }}
+          >
             The FW2025 Collection is here. Comfort redefined.
           </Typography>
           <Button 

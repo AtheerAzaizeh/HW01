@@ -1,11 +1,11 @@
 // src/pages/Admin.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Container, Box, Typography, Tabs, Tab, Paper, Grid,
+  Container, Box, Typography, Tabs, Tab, Paper, Grid, Card, CardContent, CardMedia, CardActions,
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   Button, IconButton, Chip, Dialog, DialogTitle, DialogContent,
   DialogActions, TextField, MenuItem, Alert, Snackbar, 
-  LinearProgress, Avatar
+  LinearProgress, Avatar, useMediaQuery, useTheme
 } from '@mui/material';
 import {
   Inventory, ShoppingCart, People, Chat as ChatIcon,
@@ -27,6 +27,8 @@ const TabPanel = ({ children, value, index }) => (
 const Admin = () => {
   const { user } = useAuth();
   const isSuperAdmin = user?.role === 'superadmin';
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
   const [tab, setTab] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -234,66 +236,119 @@ const Admin = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 3 }}>
+      <Typography 
+        variant="h4" 
+        sx={{ 
+          fontWeight: 'bold', 
+          mb: 3,
+          fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' },
+          display: 'flex',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 1
+        }}
+      >
         Admin Dashboard
-        {isSuperAdmin && <Chip label="Super Admin" color="warning" size="small" sx={{ ml: 2 }} />}
+        {isSuperAdmin && <Chip label="Super Admin" color="warning" size="small" />}
       </Typography>
 
       {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
 
       <Paper sx={{ bgcolor: 'background.paper' }}>
-        <Tabs value={tab} onChange={(e, v) => setTab(v)} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tab icon={<Inventory />} label="Products" />
-          <Tab icon={<ShoppingCart />} label="Orders" />
-          <Tab icon={<ChatIcon />} label={`Support (${chats.filter(c => c.status === 'open').length})`} />
-          {isSuperAdmin && <Tab icon={<People />} label="Users" />}
+        <Tabs 
+          value={tab} 
+          onChange={(e, v) => setTab(v)} 
+          sx={{ 
+            borderBottom: 1, 
+            borderColor: 'divider',
+            '& .MuiTabs-flexContainer': {
+              flexWrap: { xs: 'wrap', sm: 'nowrap' }
+            }
+          }}
+          variant={isMobile ? "scrollable" : "standard"}
+          scrollButtons={isMobile ? "auto" : false}
+          allowScrollButtonsMobile
+        >
+          <Tab icon={<Inventory />} label={isMobile ? "" : "Products"} iconPosition="start" sx={{ minWidth: { xs: 'auto', sm: 120 } }} />
+          <Tab icon={<ShoppingCart />} label={isMobile ? "" : "Orders"} iconPosition="start" sx={{ minWidth: { xs: 'auto', sm: 120 } }} />
+          <Tab icon={<ChatIcon />} label={isMobile ? `(${chats.filter(c => c.status === 'open').length})` : `Support (${chats.filter(c => c.status === 'open').length})`} iconPosition="start" sx={{ minWidth: { xs: 'auto', sm: 120 } }} />
+          {isSuperAdmin && <Tab icon={<People />} label={isMobile ? "" : "Users"} iconPosition="start" sx={{ minWidth: { xs: 'auto', sm: 120 } }} />}
         </Tabs>
 
         {/* PRODUCTS TAB */}
         <TabPanel value={tab} index={0}>
-          <Box sx={{ p: 3 }}>
+          <Box sx={{ p: { xs: 2, sm: 3 } }}>
             <Button 
               variant="contained" 
               startIcon={<Add />}
               onClick={() => openProductDialog()}
               sx={{ mb: 3, bgcolor: '#FFD700', color: 'black' }}
+              fullWidth={isMobile}
             >
               Add Product
             </Button>
 
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Image</TableCell>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Price</TableCell>
-                    <TableCell>Category</TableCell>
-                    <TableCell>Stock</TableCell>
-                    <TableCell>Featured</TableCell>
-                    <TableCell>Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {products.map((product) => (
-                    <TableRow key={product._id}>
-                      <TableCell>
-                        <Avatar src={product.image} variant="rounded" sx={{ width: 50, height: 50 }} />
-                      </TableCell>
-                      <TableCell>{product.name}</TableCell>
-                      <TableCell>${product.price}</TableCell>
-                      <TableCell><Chip label={product.category} size="small" /></TableCell>
-                      <TableCell>{product.stock}</TableCell>
-                      <TableCell>{product.featured ? '⭐' : '-'}</TableCell>
-                      <TableCell>
-                        <IconButton onClick={() => openProductDialog(product)}><Edit /></IconButton>
-                        <IconButton color="error" onClick={() => handleDeleteProduct(product._id)}><Delete /></IconButton>
-                      </TableCell>
+            {/* Mobile Card Layout */}
+            {isMobile ? (
+              <Grid container spacing={2}>
+                {products.map((product) => (
+                  <Grid item xs={12} key={product._id}>
+                    <Card sx={{ bgcolor: 'background.paper' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', p: 2 }}>
+                        <Avatar src={product.image} variant="rounded" sx={{ width: 60, height: 60, mr: 2 }} />
+                        <Box sx={{ flex: 1 }}>
+                          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{product.name}</Typography>
+                          <Typography variant="body2" color="text.secondary">${product.price} • Stock: {product.stock}</Typography>
+                          <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5 }}>
+                            <Chip label={product.category} size="small" />
+                            {product.featured && <Chip label="⭐ Featured" size="small" color="warning" />}
+                          </Box>
+                        </Box>
+                        <Box>
+                          <IconButton size="small" onClick={() => openProductDialog(product)}><Edit /></IconButton>
+                          <IconButton size="small" color="error" onClick={() => handleDeleteProduct(product._id)}><Delete /></IconButton>
+                        </Box>
+                      </Box>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            ) : (
+              /* Desktop Table Layout */
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Image</TableCell>
+                      <TableCell>Name</TableCell>
+                      <TableCell>Price</TableCell>
+                      <TableCell>Category</TableCell>
+                      <TableCell>Stock</TableCell>
+                      <TableCell>Featured</TableCell>
+                      <TableCell>Actions</TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                  </TableHead>
+                  <TableBody>
+                    {products.map((product) => (
+                      <TableRow key={product._id}>
+                        <TableCell>
+                          <Avatar src={product.image} variant="rounded" sx={{ width: 50, height: 50 }} />
+                        </TableCell>
+                        <TableCell>{product.name}</TableCell>
+                        <TableCell>${product.price}</TableCell>
+                        <TableCell><Chip label={product.category} size="small" /></TableCell>
+                        <TableCell>{product.stock}</TableCell>
+                        <TableCell>{product.featured ? '⭐' : '-'}</TableCell>
+                        <TableCell>
+                          <IconButton onClick={() => openProductDialog(product)}><Edit /></IconButton>
+                          <IconButton color="error" onClick={() => handleDeleteProduct(product._id)}><Delete /></IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
           </Box>
         </TabPanel>
 

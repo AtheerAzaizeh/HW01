@@ -23,10 +23,13 @@ const HoodieCard = ({ hoodie, onAddToCart }) => {
       <Box sx={{ position: 'relative', overflow: 'hidden' }}>
         <CardMedia
           component="img"
-          height="350"
+          sx={{ 
+            height: { xs: 250, sm: 300, md: 350 },
+            objectFit: 'cover', 
+            filter: 'brightness(0.9)' 
+          }}
           image={hoodie.image}
           alt={hoodie.name}
-          sx={{ objectFit: 'cover', filter: 'brightness(0.9)' }}
         />
         {/* Optional: Overlay tag */}
         <Box sx={{ position: 'absolute', top: 10, right: 10, bgcolor: '#FFD700', color: 'black', px: 1, fontWeight: 'bold', fontSize: '0.8rem' }}>

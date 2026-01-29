@@ -67,7 +67,15 @@ const Products = () => {
   return (
     <Container maxWidth="lg" sx={{ py: 8 }}>
       <Box sx={{ mb: 6 }}>
-        <Typography variant="h3" sx={{ fontWeight: 800, textTransform: 'uppercase', mb: 2 }}>
+        <Typography 
+          variant="h3" 
+          sx={{ 
+            fontWeight: 800, 
+            textTransform: 'uppercase', 
+            mb: 2,
+            fontSize: { xs: '1.75rem', sm: '2.5rem', md: '3rem' }
+          }}
+        >
           All Hoodies
         </Typography>
         <Typography variant="body1" color="text.secondary">
@@ -76,12 +84,18 @@ const Products = () => {
       </Box>
 
       {/* Filters */}
-      <Box sx={{ display: 'flex', gap: 2, mb: 4, flexWrap: 'wrap' }}>
+      <Box sx={{ 
+        display: 'flex', 
+        gap: 2, 
+        mb: 4, 
+        flexWrap: 'wrap',
+        flexDirection: { xs: 'column', sm: 'row' }
+      }}>
         <TextField
           placeholder="Search hoodies..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          sx={{ minWidth: 250 }}
+          sx={{ minWidth: { xs: '100%', sm: 250 }, flex: { xs: 1, sm: 'none' } }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -91,7 +105,7 @@ const Products = () => {
           }}
         />
 
-        <FormControl sx={{ minWidth: 150 }}>
+        <FormControl sx={{ minWidth: { xs: '100%', sm: 150 }, flex: { xs: 1, sm: 'none' } }}>
           <InputLabel>Category</InputLabel>
           <Select
             value={category}
@@ -107,7 +121,7 @@ const Products = () => {
           </Select>
         </FormControl>
 
-        <FormControl sx={{ minWidth: 150 }}>
+        <FormControl sx={{ minWidth: { xs: '100%', sm: 150 }, flex: { xs: 1, sm: 'none' } }}>
           <InputLabel>Sort By</InputLabel>
           <Select
             value={sort}

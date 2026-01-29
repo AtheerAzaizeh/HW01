@@ -868,8 +868,8 @@ npm run dev
 
 ### Access Application
 
-- Frontend: https://hoodie-store-project.netlify.app
-- Backend: https://hw01-7bba.onrender.com/api
+- Frontend: http://localhost:5173/
+- Backend: https: http://localhost:5000
 
 ---
 
