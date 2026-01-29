@@ -25,8 +25,17 @@ const httpServer = createServer(app);
 // Connect to MongoDB
 connectDB();
 
-// Middleware
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3000'];
+// Middleware - Dynamic CORS for production deployment
+const allowedOrigins = [
+  'http://localhost:5173', 
+  'http://localhost:5174', 
+  'http://localhost:3000'
+];
+
+// Add production frontend URL if set (for Netlify deployment)
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL);
+}
 
 app.use(cors({
   origin: allowedOrigins,

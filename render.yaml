@@ -1,0 +1,21 @@
+# Render Deployment Configuration
+# This file tells Render how to build and deploy the server
+
+services:
+  - type: web
+    name: blakv-api
+    runtime: node
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false # User must set this manually
+      - key: JWT_SECRET
+        sync: false # User must set this manually
+      - key: JWT_EXPIRE
+        value: 7d
+      - key: FRONTEND_URL
+        sync: false # User must set this after Netlify deploy
