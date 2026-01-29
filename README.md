@@ -1,61 +1,273 @@
-# BLAKV. | Premium Hoodies Store
+# BLAKV Hoodie Store
 
-This project is a modern, responsive React application built for a streetwear brand named **BLAKV**. It demonstrates the use of React Hooks, Material UI (MUI), and API integration as part of a university assignment.
+A full-stack e-commerce application for premium hoodies, built with React, Node.js, Express, and MongoDB.
 
-## 🚀 Project Overview
+![BLAKV Store](https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=800&q=80)
 
-The website allows users to:
-1.  **Browse Products:** View a curated collection of local hoodie products (managed via state).
-2.  **Order Custom Designs:** Submit a request for bulk or custom orders with form validation.
-3.  **View External Inventory:** Fetch and display real-time product data from a public API.
+## 🚀 Tech Stack
 
-## 📂 Requirement Mapping (HW #2 Update)
+### Frontend
 
-### Part 1: Routing (React Router)
-The application uses `react-router-dom` to handle navigation without page reloads.
-- **Routes**:
-    - `/` -> **Home Page**
-    - `/contact` -> **Form Page**
-    - `/api` -> **External Data Page**
-    - `*` -> **404 Not Found Page** (Handles unknown URLs)
+- **React 19** - UI library
+- **Redux Toolkit** - State management (cart)
+- **React Router** - Navigation
+- **Material UI** - Component library
+- **Vite** - Build tool
 
-### Part 2: Global State (Context API)
-A `CartContext` has been implemented to share shopping cart data across components.
-- **What it stores**: An array of product objects acting as the "Cart".
-- **How it's used**:
-    - **`CartContext.jsx`**: Provides `addToCart` and `getCartCount` functions.
-    - **`Navbar.jsx`**: Consumes context to display real-time number of items in the cart (red badge).
-    - **`Home.jsx`**: Uses `addToCart` to add featured products to the global state.
-    - **`ExternalData.jsx`**: Uses `addToCart` to add API-fetched products to the global state.
+### Backend
 
-## 🛠 Tech Stack
+- **Node.js** - Runtime
+- **Express.js** - Web framework
+- **MongoDB** - Database
+- **Mongoose** - ODM
+- **JWT** - Authentication
+- **bcryptjs** - Password hashing
+- **express-validator** - Input validation
 
-* **Framework:** React + Vite
-* **Styling:** Material UI (MUI) & Emotion
-* **Routing:** React Router DOM
-* **Icons:** MUI Icons Material
+## 📁 Project Structure
 
-## How to Run
+```
+HW01/
+├── src/                      # React Frontend
+│   ├── components/
+│   │   ├── common/           # Reusable components
+│   │   └── ...
+│   ├── pages/                # Page components
+│   ├── hooks/                # Custom hooks
+│   │   ├── useLocalStorage   # Persistent state
+│   │   ├── useApi            # API fetching
+│   │   └── useForm           # Form handling
+│   ├── store/                # Redux store
+│   ├── context/              # Auth context
+│   ├── services/             # API service
+│   └── utils/                # Validators
+├── server/                   # Node.js Backend
+│   ├── config/               # DB configuration
+│   ├── controllers/          # Route handlers
+│   ├── middleware/           # Auth, validation, errors
+│   ├── models/               # MongoDB schemas
+│   ├── routes/               # API routes
+│   └── server.js             # Entry point
+└── README.md
+```
 
-Follow these steps to set up the project locally:
+## 🛠️ Setup Instructions
 
-1.  **Install Dependencies:**
-    Open your terminal in the project folder and run:
-    ```bash
-    npm install
-    ```
+### Prerequisites
 
-2.  **Start the Development Server:**
-    Run the following command to start the app:
-    ```bash
-    npm run dev
-    ```
+- Node.js 18+
+- MongoDB (local or [MongoDB Atlas](https://www.mongodb.com/atlas))
 
-3.  **Open in Browser:**
-    Click the link shown in the terminal (usually `http://localhost:5173`).
+### 1. Clone the Repository
 
----
+```bash
+git clone <your-repo-url>
+cd HW01
+```
 
-### Developer Notes
-* **Architecture:** The project uses a Clean Architecture approach, separating `components` (reusable UI) from `pages` (views).
-* **Theme:** A custom MUI theme (`src/theme.js`) controls the dark mode, typography, and gold accent colors globally.
+### 2. Server Setup
+
+```bash
+cd server
+npm install
+```
+
+Create `.env` file (or copy from `.env.example`):
+
+```env
+PORT=5000
+MONGODB_URI=mongodb://localhost:27017/blakv
+JWT_SECRET=your-super-secret-jwt-key
+JWT_EXPIRE=7d
+```
+
+**For MongoDB Atlas:**
+
+```env
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/blakv
+```
+
+### 3. Seed Database (Optional but Recommended)
+
+This creates an admin user and 10 sample products:
+
+```bash
+npm run seed
+```
+
+**Test Accounts:**
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | admin@blakv.com | admin123 |
+| User | john@example.com | password123 |
+
+### 4. Start Server
+
+```bash
+npm run dev
+```
+
+Server runs at: `http://localhost:5000`
+
+### 5. Client Setup
+
+Open a new terminal:
+
+```bash
+# From project root (HW01/)
+npm install
+```
+
+Create `.env` file:
+
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+### 6. Start Client
+
+```bash
+npm run dev
+```
+
+Client runs at: `http://localhost:5173`
+
+## 📱 Features
+
+### User Features
+
+- ✅ Browse hoodie products
+- ✅ Filter by category
+- ✅ Search products
+- ✅ Add to cart
+- ✅ User registration & login
+- ✅ Place orders
+- ✅ View order history
+- ✅ Dark/Light theme toggle
+
+### Admin Features
+
+- ✅ Product management (CRUD)
+- ✅ View all orders
+- ✅ Update order status
+
+## 🔌 API Endpoints
+
+### Auth
+
+| Method | Endpoint             | Description      |
+| ------ | -------------------- | ---------------- |
+| POST   | `/api/auth/register` | Register user    |
+| POST   | `/api/auth/login`    | Login user       |
+| GET    | `/api/auth/me`       | Get current user |
+
+### Products
+
+| Method | Endpoint            | Description        |
+| ------ | ------------------- | ------------------ |
+| GET    | `/api/products`     | Get all products   |
+| GET    | `/api/products/:id` | Get single product |
+| POST   | `/api/products`     | Create (Admin)     |
+| PUT    | `/api/products/:id` | Update (Admin)     |
+| DELETE | `/api/products/:id` | Delete (Admin)     |
+
+### Orders
+
+| Method | Endpoint                 | Description           |
+| ------ | ------------------------ | --------------------- |
+| GET    | `/api/orders`            | Get user's orders     |
+| GET    | `/api/orders/:id`        | Get single order      |
+| POST   | `/api/orders`            | Create order          |
+| GET    | `/api/orders/admin/all`  | All orders (Admin)    |
+| PUT    | `/api/orders/:id/status` | Update status (Admin) |
+
+## 🎣 Custom Hooks
+
+### useLocalStorage
+
+```javascript
+const [value, setValue] = useLocalStorage("key", initialValue);
+```
+
+Used for: Theme preference, recently viewed products
+
+### useApi
+
+```javascript
+const { data, loading, error, refetch } = useApi(url);
+```
+
+Used for: Product fetching with loading/error states
+
+### useForm
+
+```javascript
+const { values, errors, handleChange, handleSubmit, isSubmitting } = useForm(
+  initialValues,
+  validationFunction,
+  onSubmitHandler,
+);
+```
+
+Used for: Login, Register, Checkout forms with validation
+
+## 🔒 Validation
+
+### Client-Side
+
+- Required field validation
+- Email format validation
+- Password minimum length (6 chars)
+- Password confirmation matching
+
+### Server-Side
+
+- express-validator middleware
+- Input sanitization
+- Mongoose schema validation
+- Meaningful error messages
+
+## 🧪 Error Handling
+
+- Loading spinners during data fetch
+- Error messages with retry options
+- Empty state displays
+- Form validation errors
+- Server error handling
+- 404 page for unknown routes
+
+## 📦 Environment Variables
+
+### Server (.env)
+
+```env
+PORT=5000
+MONGODB_URI=mongodb://localhost:27017/blakv
+JWT_SECRET=your-secret-key
+JWT_EXPIRE=7d
+```
+
+### Client (.env)
+
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+## 🚀 Running in Production
+
+### Build Client
+
+```bash
+npm run build
+```
+
+### Start Server
+
+```bash
+cd server
+npm start
+```
+
+## 📝 License
+
+MIT

@@ -1,38 +1,91 @@
 // src/pages/Home.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import HoodieCard from '../components/HoodieCard';
-import { useCart } from '../context/CartContext';
-import { Container, Grid, Typography, Box, Button, Snackbar, Alert } from '@mui/material';
+import { useDispatch } from 'react-redux';
+import { addItem } from '../store/cartSlice';
+import useLocalStorage from '../hooks/useLocalStorage';
+import api from '../services/api';
+import { Container, Grid, Typography, Box, Button, Snackbar, Alert, CircularProgress, Chip } from '@mui/material';
+import HistoryIcon from '@mui/icons-material/History';
 
 const Home = () => {
-  // 1. Product Data
-  const [hoodies] = useState([
-    { id: 1, name: 'ESSENTIALS Black', price: 89.99, description: 'Heavyweight Cotton', image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=800&q=80' },
-    { id: 2, name: 'Oversized Concrete', price: 95.00, description: 'Street Fit / Grey', image: 'https://images.unsplash.com/photo-1578768079052-aa76e52ff62e?auto=format&fit=crop&w=800&q=80' },
-    { id: 3, name: 'Signature Red', price: 110.00, description: 'Limited Edition', image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80' },
-    { id: 4, name: 'Midnight Blue', price: 85.00, description: 'Fleece Lined', image: 'https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?auto=format&fit=crop&w=800&q=80' },
-  ]);
+  // Redux: useDispatch for adding to cart
+  const dispatch = useDispatch();
 
-  // 2. Notification State
+  // useLocalStorage: Track recently viewed products
+  const [recentlyViewed, setRecentlyViewed] = useLocalStorage('recentlyViewed', []);
+
+  // Products state - fetch from our server
+  const [products, setProducts] = useState([]);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch products from our server API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        // Fetch all products from our server
+        const response = await api.products.getAll();
+        const allProducts = response.data || [];
+        
+        // Featured products (first 4)
+        setFeaturedProducts(allProducts.filter(p => p.featured).slice(0, 4));
+        // Latest drops (non-featured, first 4)
+        setProducts(allProducts.filter(p => !p.featured).slice(0, 4));
+        
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  // Notification State
   const [toast, setToast] = useState({ open: false, message: '' });
 
-  // 3. Handle Buy Action
-  const { addToCart } = useCart();
-
+  // Handle Buy Action - uses Redux dispatch
   const handleAddToCart = (product) => {
-    // Add to Global Context
-    addToCart(product);
+    // Normalize product structure
+    const normalizedProduct = {
+      id: product._id || product.id,
+      name: product.name || product.title,
+      title: product.name || product.title,
+      price: product.price,
+      image: product.image || product.thumbnail,
+      description: product.description || product.category
+    };
+
+    // Add to Redux store
+    dispatch(addItem(normalizedProduct));
+
+    // Track in recently viewed using useLocalStorage
+    setRecentlyViewed(prev => {
+      const exists = prev.find(p => p.id === normalizedProduct.id);
+      if (exists) return prev;
+      // Keep only last 5 items
+      return [normalizedProduct, ...prev].slice(0, 5);
+    });
 
     // Show success message
     setToast({
       open: true,
-      message: `${product.name} added to cart!`
+      message: `${normalizedProduct.name} added to cart!`
     });
   };
 
   const handleCloseToast = (event, reason) => {
     if (reason === 'clickaway') return;
     setToast({ ...toast, open: false });
+  };
+
+  const clearRecentlyViewed = () => {
+    setRecentlyViewed([]);
   };
 
   return (
@@ -45,7 +98,7 @@ const Home = () => {
           alignItems: 'center',
           justifyContent: 'center',
           textAlign: 'center',
-          backgroundImage: 'linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url(https://images.unsplash.com/photo-1523396860166-407c3451e9f5?auto=format&fit=crop&w=1600&q=80)',
+          backgroundImage: 'linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url(https://images.unsplash.com/photo-1523398002811-999ca8dec234?auto=format&fit=crop&w=1600&q=80)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           mb: 8
@@ -53,35 +106,125 @@ const Home = () => {
       >
         <Container>
           <Typography variant="h2" sx={{ color: 'white', mb: 2, textTransform: 'uppercase', letterSpacing: '0.2em', fontWeight: 900 }}>
-            Redefine Comfort
+            Premium Hoodies
           </Typography>
           <Typography variant="h6" sx={{ color: 'grey.300', mb: 4, fontWeight: 300 }}>
-            The FW2025 Collection is here.
+            The FW2025 Collection is here. Comfort redefined.
           </Typography>
-          <Button variant="contained" color="secondary" size="large" sx={{ px: 5, py: 1.5, fontWeight: 'bold', color: 'black' }}>
+          <Button 
+            variant="contained" 
+            color="secondary" 
+            size="large" 
+            href="/products"
+            sx={{ px: 5, py: 1.5, fontWeight: 'bold', color: 'black' }}
+          >
             Shop Collection
           </Button>
         </Container>
       </Box>
 
-      {/* PRODUCT GRID */}
-      <Container maxWidth="lg" sx={{ mb: 10 }}>
-        <Typography variant="h4" sx={{ mb: 4, fontWeight: 700, textTransform: 'uppercase', borderLeft: '4px solid #FFD700', pl: 2 }}>
-          Latest Drops
-        </Typography>
-
-        <Grid container spacing={4}>
-          {hoodies.map((hoodie) => (
-            <Grid item key={hoodie.id} xs={12} sm={6} md={3}>
-              {/* Pass the function to the child component */}
-              <HoodieCard
-                hoodie={hoodie}
-                onAddToCart={handleAddToCart}
+      {/* RECENTLY VIEWED SECTION - uses useLocalStorage */}
+      {recentlyViewed.length > 0 && (
+        <Container maxWidth="lg" sx={{ mb: 6 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <HistoryIcon sx={{ color: 'secondary.main' }} />
+              <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                Recently Viewed
+              </Typography>
+            </Box>
+            <Button size="small" onClick={clearRecentlyViewed} sx={{ color: 'text.secondary' }}>
+              Clear History
+            </Button>
+          </Box>
+          <Box sx={{ display: 'flex', gap: 2, overflowX: 'auto', pb: 2 }}>
+            {recentlyViewed.map((item) => (
+              <Chip
+                key={item.id}
+                label={item.name || item.title}
+                variant="outlined"
+                sx={{ 
+                  color: 'text.primary', 
+                  borderColor: 'secondary.main',
+                  '&:hover': { bgcolor: 'rgba(255, 215, 0, 0.1)' }
+                }}
               />
-            </Grid>
-          ))}
-        </Grid>
-      </Container>
+            ))}
+          </Box>
+        </Container>
+      )}
+
+      {/* Loading State */}
+      {loading && (
+        <Container maxWidth="lg" sx={{ mb: 10, textAlign: 'center', py: 8 }}>
+          <CircularProgress sx={{ color: '#FFD700' }} />
+          <Typography sx={{ mt: 2 }} color="text.secondary">Loading products...</Typography>
+        </Container>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <Container maxWidth="lg" sx={{ mb: 10 }}>
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+          <Button variant="outlined" onClick={() => window.location.reload()}>
+            Retry
+          </Button>
+        </Container>
+      )}
+
+      {/* FEATURED PRODUCTS */}
+      {!loading && !error && featuredProducts.length > 0 && (
+        <Container maxWidth="lg" sx={{ mb: 10 }}>
+          <Typography variant="h4" sx={{ mb: 4, fontWeight: 700, textTransform: 'uppercase', borderLeft: '4px solid #FFD700', pl: 2 }}>
+            Featured Products
+          </Typography>
+
+          <Grid container spacing={4}>
+            {featuredProducts.map((product) => (
+              <Grid item key={product._id} xs={12} sm={6} md={3}>
+                <HoodieCard
+                  hoodie={{
+                    id: product._id,
+                    name: product.name,
+                    price: product.price,
+                    description: product.description,
+                    image: product.image
+                  }}
+                  onAddToCart={handleAddToCart}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      )}
+
+      {/* LATEST DROPS */}
+      {!loading && !error && products.length > 0 && (
+        <Container maxWidth="lg" sx={{ mb: 10 }}>
+          <Typography variant="h4" sx={{ mb: 4, fontWeight: 700, textTransform: 'uppercase', borderLeft: '4px solid #FFD700', pl: 2 }}>
+            Latest Drops
+          </Typography>
+
+          <Grid container spacing={4}>
+            {products.map((product) => (
+              <Grid item key={product._id} xs={12} sm={6} md={3}>
+                <HoodieCard
+                  hoodie={{
+                    id: product._id,
+                    name: product.name,
+                    price: product.price,
+                    description: product.description,
+                    image: product.image
+                  }}
+                  onAddToCart={handleAddToCart}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      )}
 
       {/* SUCCESS NOTIFICATION */}
       <Snackbar

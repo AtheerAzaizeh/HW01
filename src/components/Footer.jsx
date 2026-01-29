@@ -1,6 +1,7 @@
 // src/components/Footer.jsx
 import React from 'react';
 import { Box, Typography, Container, Grid, TextField, Button, IconButton, Divider } from '@mui/material';
+import { Link } from 'react-router-dom';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import YouTubeIcon from '@mui/icons-material/YouTube';
@@ -21,9 +22,9 @@ const Footer = () => {
               Designed in Daburiyya, worn globally.
             </Typography>
             <Box>
-              <IconButton sx={{ color: '#fff' }}><InstagramIcon /></IconButton>
-              <IconButton sx={{ color: '#fff' }}><TwitterIcon /></IconButton>
-              <IconButton sx={{ color: '#fff' }}><YouTubeIcon /></IconButton>
+              <IconButton sx={{ color: '#fff' }} href="https://instagram.com" target="_blank"><InstagramIcon /></IconButton>
+              <IconButton sx={{ color: '#fff' }} href="https://twitter.com" target="_blank"><TwitterIcon /></IconButton>
+              <IconButton sx={{ color: '#fff' }} href="https://youtube.com" target="_blank"><YouTubeIcon /></IconButton>
             </Box>
           </Grid>
 
@@ -33,11 +34,18 @@ const Footer = () => {
               Shop
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-              {['New Arrivals', 'Best Sellers', 'Hoodies', 'Accessories', 'Gift Cards'].map((link) => (
-                <Typography key={link} variant="body2" sx={{ color: '#aaa', cursor: 'pointer', '&:hover': { color: '#fff' } }}>
-                  {link}
-                </Typography>
-              ))}
+              <Typography component={Link} to="/products" variant="body2" sx={{ color: '#aaa', textDecoration: 'none', '&:hover': { color: '#fff' } }}>
+                All Products
+              </Typography>
+              <Typography component={Link} to="/products?category=pullover" variant="body2" sx={{ color: '#aaa', textDecoration: 'none', '&:hover': { color: '#fff' } }}>
+                Pullover Hoodies
+              </Typography>
+              <Typography component={Link} to="/products?category=zip-up" variant="body2" sx={{ color: '#aaa', textDecoration: 'none', '&:hover': { color: '#fff' } }}>
+                Zip-Up Hoodies
+              </Typography>
+              <Typography component={Link} to="/products?category=premium" variant="body2" sx={{ color: '#aaa', textDecoration: 'none', '&:hover': { color: '#fff' } }}>
+                Premium Collection
+              </Typography>
             </Box>
           </Grid>
 
@@ -47,11 +55,12 @@ const Footer = () => {
               Support
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-              {['Help Center', 'Shipping Info', 'Returns', 'Size Guide', 'Contact Us'].map((link) => (
-                <Typography key={link} variant="body2" sx={{ color: '#aaa', cursor: 'pointer', '&:hover': { color: '#fff' } }}>
-                  {link}
-                </Typography>
-              ))}
+              <Typography component={Link} to="/contact" variant="body2" sx={{ color: '#aaa', textDecoration: 'none', '&:hover': { color: '#fff' } }}>
+                Contact Us
+              </Typography>
+              <Typography component={Link} to="/support" variant="body2" sx={{ color: '#aaa', textDecoration: 'none', '&:hover': { color: '#fff' } }}>
+                Live Chat
+              </Typography>
             </Box>
           </Grid>
 
@@ -75,7 +84,7 @@ const Footer = () => {
                   '& fieldset': { borderColor: '#333' }
                 }} 
               />
-              <Button variant="contained" color="secondary" sx={{ minWidth: '100px' }}>
+              <Button variant="contained" color="secondary" sx={{ minWidth: '100px', color: 'black' }}>
                 Join
               </Button>
             </Box>
@@ -89,10 +98,9 @@ const Footer = () => {
           <Typography variant="caption" sx={{ color: '#666' }}>
             © 2025 BLAKV Hoodies. All rights reserved.
           </Typography>
-          <Box sx={{ display: 'flex', gap: 3 }}>
-            <Typography variant="caption" sx={{ color: '#666', cursor: 'pointer' }}>Privacy Policy</Typography>
-            <Typography variant="caption" sx={{ color: '#666', cursor: 'pointer' }}>Terms of Service</Typography>
-          </Box>
+          <Typography variant="caption" sx={{ color: '#666' }}>
+            Made with ❤️ for premium streetwear
+          </Typography>
         </Box>
       </Container>
     </Box>
