@@ -1,15 +1,54 @@
+// src/pages/Cart.jsx
 import React from 'react';
-import { Container, Typography, Box, List, ListItem, ListItemText, ListItemAvatar, Avatar, IconButton, Button, Paper, Divider } from '@mui/material';
+import { Container, Typography, Box, List, ListItem, ListItemText, ListItemAvatar, Avatar, IconButton, Button, Paper, Divider, Chip } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 import { Link } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectCartItems, selectLastUpdated, removeItem, clearCart, updateQuantity } from '../store/cartSlice';
+import { useNotification } from '../context/NotificationContext';
 
 const Cart = () => {
-    const { cartItems, removeFromCart, clearCart } = useCart();
+    const { notifySuccess, notifyWarning } = useNotification();
+    
+    // Redux: useSelector to get cart items and last updated timestamp
+    const cartItems = useSelector(selectCartItems);
+    const lastUpdated = useSelector(selectLastUpdated);
+    
+    // Redux: useDispatch for cart actions
+    const dispatch = useDispatch();
 
     // Calculate total price
-    const totalPrice = cartItems.reduce((acc, item) => acc + (parseFloat(item.price) || 0), 0);
+    const totalPrice = cartItems.reduce((acc, item) => acc + (parseFloat(item.price) || 0) * (item.quantity || 1), 0);
+    const totalItems = cartItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
+
+    // Handle quantity change
+    const handleQuantityChange = (id, delta) => {
+        const item = cartItems.find(i => i.id === id);
+        if (item) {
+            const newQuantity = (item.quantity || 1) + delta;
+            if (newQuantity < 1) {
+                dispatch(removeItem(id));
+                notifySuccess(`${item.name || item.title} removed from cart`, 'Item Removed');
+            } else {
+                dispatch(updateQuantity({ id, quantity: newQuantity }));
+            }
+        }
+    };
+
+    // Handle remove item
+    const handleRemoveItem = (item) => {
+        dispatch(removeItem(item.id));
+        notifySuccess(`${item.name || item.title} removed from cart`, 'Item Removed');
+    };
+
+    // Handle clear cart
+    const handleClearCart = () => {
+        dispatch(clearCart());
+        notifyWarning('All items have been removed', 'Cart Cleared');
+    };
 
     if (cartItems.length === 0) {
         return (
@@ -27,9 +66,19 @@ const Cart = () => {
 
     return (
         <Container maxWidth="md" sx={{ py: 8 }}>
-            <Typography variant="h4" sx={{ mb: 4, fontWeight: 'bold' }}>
-                Your Cart ({cartItems.length})
-            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+                <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                    Your Cart ({totalItems} items)
+                </Typography>
+                {lastUpdated && (
+                    <Chip 
+                        label={`Last updated: ${new Date(lastUpdated).toLocaleTimeString()}`}
+                        size="small"
+                        variant="outlined"
+                        sx={{ color: 'text.secondary' }}
+                    />
+                )}
+            </Box>
 
             <Paper elevation={0} sx={{ bgcolor: 'background.paper', borderRadius: 2, overflow: 'hidden' }}>
                 <List sx={{ p: 0 }}>
@@ -37,9 +86,36 @@ const Cart = () => {
                         <React.Fragment key={`${item.id}-${index}`}>
                             <ListItem
                                 secondaryAction={
-                                    <IconButton edge="end" aria-label="delete" onClick={() => removeFromCart(item.id)} color="error">
-                                        <DeleteIcon />
-                                    </IconButton>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        {/* Quantity Controls */}
+                                        <IconButton 
+                                            size="small" 
+                                            onClick={() => handleQuantityChange(item.id, -1)}
+                                            sx={{ color: 'text.secondary' }}
+                                        >
+                                            <RemoveIcon fontSize="small" />
+                                        </IconButton>
+                                        <Typography sx={{ minWidth: 24, textAlign: 'center' }}>
+                                            {item.quantity || 1}
+                                        </Typography>
+                                        <IconButton 
+                                            size="small" 
+                                            onClick={() => handleQuantityChange(item.id, 1)}
+                                            sx={{ color: 'text.secondary' }}
+                                        >
+                                            <AddIcon fontSize="small" />
+                                        </IconButton>
+                                        {/* Delete Button */}
+                                        <IconButton 
+                                            edge="end" 
+                                            aria-label="delete" 
+                                            onClick={() => handleRemoveItem(item)} 
+                                            color="error"
+                                            sx={{ ml: 2 }}
+                                        >
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </Box>
                                 }
                                 sx={{ p: 3 }}
                             >
@@ -48,7 +124,7 @@ const Cart = () => {
                                         src={item.image}
                                         alt={item.name || item.title}
                                         variant="rounded"
-                                        sx={{ width: 80, height: 80 }}
+                                        sx={{ width: 80, height: 80, bgcolor: 'white' }}
                                     />
                                 </ListItemAvatar>
                                 <ListItemText
@@ -58,9 +134,14 @@ const Cart = () => {
                                         </Typography>
                                     }
                                     secondary={
-                                        <Typography variant="body1" sx={{ color: 'primary.main', mt: 1 }}>
-                                            ${item.price}
-                                        </Typography>
+                                        <Box>
+                                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                                ${item.price} × {item.quantity || 1}
+                                            </Typography>
+                                            <Typography variant="body1" sx={{ color: 'secondary.main', mt: 0.5, fontWeight: 'bold' }}>
+                                                ${(parseFloat(item.price) * (item.quantity || 1)).toFixed(2)}
+                                            </Typography>
+                                        </Box>
                                     }
                                 />
                             </ListItem>
@@ -71,15 +152,25 @@ const Cart = () => {
             </Paper>
 
             <Box sx={{ mt: 4, p: 3, bgcolor: 'background.paper', borderRadius: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Button variant="outlined" color="error" onClick={clearCart}>
+                <Button 
+                    variant="outlined" 
+                    color="error" 
+                    onClick={() => dispatch(clearCart())}
+                >
                     Clear Cart
                 </Button>
                 <Box sx={{ textAlign: 'right' }}>
                     <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
                         Total: ${totalPrice.toFixed(2)}
                     </Typography>
-                    <Button variant="contained" size="large" sx={{ mt: 2, px: 6, fontWeight: 'bold', color: 'black', bgcolor: '#FFD700' }}>
-                        Checkout
+                    <Button 
+                        variant="contained" 
+                        size="large" 
+                        component={Link}
+                        to="/checkout"
+                        sx={{ mt: 2, px: 6, fontWeight: 'bold', color: 'black', bgcolor: '#FFD700' }}
+                    >
+                        Proceed to Checkout
                     </Button>
                 </Box>
             </Box>
