@@ -1,6 +1,6 @@
 // src/pages/ExternalData.jsx
 // External API Integration - Fetches hoodie products from external sources
-// Uses JSONPlaceholder-style external JSON hosting
+// Uses the custom useApi hook for data fetching (HW3 requirement)
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -11,10 +11,7 @@ import ReplayIcon from '@mui/icons-material/Replay';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useDispatch, useSelector } from 'react-redux';
 import { addItem, selectCartItems } from '../store/cartSlice';
-
-// External Hoodie Data - This comes from a GitHub Gist (real external URL)
-// This simulates fetching from an external hoodie store API
-const EXTERNAL_HOODIES_URL = 'https://gist.githubusercontent.com/AtheerAl/hoodie-api/main/hoodies.json';
+import useApi from '../hooks/useApi';
 
 // Fallback hoodie data (in case external fails - still demonstrates the fetch pattern)
 const HOODIE_DATA = [
@@ -85,44 +82,28 @@ const HOODIE_DATA = [
 ];
 
 const ExternalData = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [apiSource, setApiSource] = useState('');
+  // ===== useApi HOOK (HW3 Requirement) =====
+  // Using custom useApi hook instead of manual fetch/useState/useEffect
+  const { 
+    data: apiResponse, 
+    loading, 
+    error: apiError, 
+    refetch 
+  } = useApi(`${import.meta.env.VITE_API_URL}/external/scrape`);
 
   const dispatch = useDispatch();
   const cartItems = useSelector(selectCartItems);
 
-  // Fetch hoodies from external source
-  const fetchHoodies = async () => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      // Call our backend scraping endpoint
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/external/scrape`);
-      const data = await response.json();
-      
-      if (data.success && Array.isArray(data.data)) {
-          setProducts(data.data);
-          setApiSource('Live eBay Data (Scraped)');
-      } else {
-          throw new Error(data.message || 'Failed to load data');
-      }
-    } catch (err) {
-      console.error('Scraping failed:', err);
-      // Fallback: Use static hoodie data
-      setProducts(HOODIE_DATA);
-      setApiSource('Fallback Data (Scraping Failed - Check Server/Python)');
-      setError('Could not scrape live data. Showing fallback.');
-    } finally {
-        setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchHoodies();
-  }, []);
+  // Process data from useApi hook
+  const products = apiResponse?.success && Array.isArray(apiResponse?.data) 
+    ? apiResponse.data 
+    : HOODIE_DATA;
+  
+  const apiSource = apiResponse?.success 
+    ? 'External API (via useApi hook)' 
+    : 'Fallback Data';
+  
+  const error = apiError ? 'Could not load live data. Showing fallback.' : null;
 
   const isInCart = (productId) => {
     return cartItems.some(item => item.id === productId);
@@ -158,7 +139,7 @@ const ExternalData = () => {
           variant="outlined"
           color="inherit"
           startIcon={<ReplayIcon />}
-          onClick={fetchHoodies}
+          onClick={refetch}
           sx={{ color: 'text.primary', borderColor: 'text.primary' }}
         >
           Try Again
@@ -184,7 +165,7 @@ const ExternalData = () => {
           <Button
             variant="outlined"
             startIcon={<ReplayIcon />}
-            onClick={fetchHoodies}
+            onClick={refetch}
             sx={{ color: 'text.secondary', borderColor: 'text.secondary' }}
           >
             Refresh Data

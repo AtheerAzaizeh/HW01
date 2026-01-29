@@ -1,10 +1,10 @@
 // src/pages/Home.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import HoodieCard from '../components/HoodieCard';
 import { useDispatch } from 'react-redux';
 import { addItem } from '../store/cartSlice';
 import useLocalStorage from '../hooks/useLocalStorage';
-import api from '../services/api';
+import useApi from '../hooks/useApi';
 import { Container, Grid, Typography, Box, Button, Snackbar, Alert, CircularProgress, Chip } from '@mui/material';
 import HistoryIcon from '@mui/icons-material/History';
 
@@ -15,36 +15,26 @@ const Home = () => {
   // useLocalStorage: Track recently viewed products
   const [recentlyViewed, setRecentlyViewed] = useLocalStorage('recentlyViewed', []);
 
-  // Products state - fetch from our server
-  const [products, setProducts] = useState([]);
-  const [featuredProducts, setFeaturedProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // ===== useApi HOOK (HW3 Requirement) =====
+  // Using custom useApi hook instead of manual fetch/useState/useEffect
+  const { 
+    data: apiResponse, 
+    loading, 
+    error 
+  } = useApi(`${import.meta.env.VITE_API_URL}/products`);
 
-  // Fetch products from our server API
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        // Fetch all products from our server
-        const response = await api.products.getAll();
-        const allProducts = response.data || [];
-        
-        // Featured products (first 4)
-        setFeaturedProducts(allProducts.filter(p => p.featured).slice(0, 4));
-        // Latest drops (non-featured, first 4)
-        setProducts(allProducts.filter(p => !p.featured).slice(0, 4));
-        
-        setError(null);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Process products from useApi response
+  const allProducts = useMemo(() => {
+    return apiResponse?.data || [];
+  }, [apiResponse]);
 
-    fetchProducts();
-  }, []);
+  const featuredProducts = useMemo(() => {
+    return allProducts.filter(p => p.featured).slice(0, 4);
+  }, [allProducts]);
+
+  const products = useMemo(() => {
+    return allProducts.filter(p => !p.featured).slice(0, 4);
+  }, [allProducts]);
 
   // Notification State
   const [toast, setToast] = useState({ open: false, message: '' });
