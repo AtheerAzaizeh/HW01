@@ -1,7 +1,7 @@
 // src/App.jsx
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider, CssBaseline, Box, createTheme } from '@mui/material';
+import { ThemeProvider, CssBaseline, Box, createTheme, CircularProgress } from '@mui/material';
 import useLocalStorage from './hooks/useLocalStorage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
@@ -12,20 +12,21 @@ import Footer from './components/Footer';
 import ChatWidget from './components/chat/ChatWidget';
 import GlobalSocketListener from './components/GlobalSocketListener';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import ErrorBoundary from './components/common/ErrorBoundary';
 
-// Pages
-import Home from './pages/Home';
-import Products from './pages/Products';
-import ExternalData from './pages/ExternalData';
-import Cart from './pages/Cart';
-import Contact from './pages/Contact';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Profile from './pages/Profile';
-import Checkout from './pages/Checkout';
-import Admin from './pages/Admin';
-import Support from './pages/Support';
-import NotFound from './pages/NotFound';
+// Lazy-loaded Pages for Code Splitting
+const Home = lazy(() => import('./pages/Home'));
+const Products = lazy(() => import('./pages/Products'));
+const ExternalData = lazy(() => import('./pages/ExternalData'));
+const Cart = lazy(() => import('./pages/Cart'));
+const Contact = lazy(() => import('./pages/Contact'));
+const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
+const Profile = lazy(() => import('./pages/Profile'));
+const Checkout = lazy(() => import('./pages/Checkout'));
+const Admin = lazy(() => import('./pages/Admin'));
+const Support = lazy(() => import('./pages/Support'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Create themes
 const darkTheme = createTheme({
@@ -203,7 +204,11 @@ function App() {
             <SocketProvider>
               <AppLayout themeMode={themeMode} toggleTheme={toggleTheme}>
                 <GlobalSocketListener />
-                <AppRoutes />
+                <ErrorBoundary>
+                  <Suspense fallback={<LoadingScreen />}>
+                    <AppRoutes />
+                  </Suspense>
+                </ErrorBoundary>
               </AppLayout>
             </SocketProvider>
           </AuthProvider>

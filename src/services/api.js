@@ -6,8 +6,26 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 // Get auth token from localStorage
 const getToken = () => localStorage.getItem('token');
 
-// Base fetch wrapper with auth header
-const apiFetch = async (endpoint, options = {}) => {
+// Retry configuration
+const MAX_RETRIES = 3;
+const INITIAL_RETRY_DELAY = 1000; // 1 second
+
+// Sleep utility for retries
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Check if error is retryable (network errors or 5xx server errors)
+const isRetryableError = (error, status) => {
+  // Network errors (no status) are retryable
+  if (!status) return true;
+  // 5xx server errors are retryable
+  if (status >= 500 && status < 600) return true;
+  // 429 Too Many Requests is retryable
+  if (status === 429) return true;
+  return false;
+};
+
+// Base fetch wrapper with auth header and retry logic
+const apiFetch = async (endpoint, options = {}, retries = MAX_RETRIES) => {
   const token = getToken();
   
   const config = {
@@ -19,17 +37,44 @@ const apiFetch = async (endpoint, options = {}) => {
     },
   };
 
-  const response = await fetch(`${API_URL}${endpoint}`, config);
-  const data = await response.json();
+  let lastError;
+  
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const response = await fetch(`${API_URL}${endpoint}`, config);
+      const data = await response.json();
 
-  if (!response.ok) {
-    const error = new Error(data.message || 'API Error');
-    error.status = response.status;
-    error.errors = data.errors;
-    throw error;
+      if (!response.ok) {
+        const error = new Error(data.message || 'API Error');
+        error.status = response.status;
+        error.errors = data.errors;
+        
+        // Don't retry client errors (4xx) except 429
+        if (!isRetryableError(error, response.status)) {
+          throw error;
+        }
+        
+        lastError = error;
+        throw error; // Throw to trigger retry
+      }
+
+      return data;
+    } catch (error) {
+      lastError = error;
+      
+      // If it's a non-retryable error or last attempt, throw immediately
+      if (!isRetryableError(error, error.status) || attempt === retries) {
+        throw error;
+      }
+      
+      // Exponential backoff: 1s, 2s, 4s
+      const delay = INITIAL_RETRY_DELAY * Math.pow(2, attempt);
+      console.warn(`API request failed, retrying in ${delay}ms... (attempt ${attempt + 1}/${retries})`);
+      await sleep(delay);
+    }
   }
-
-  return data;
+  
+  throw lastError;
 };
 
 // API service object

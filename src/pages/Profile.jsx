@@ -233,6 +233,8 @@ const Profile = () => {
                   <React.Fragment key={order._id}>
                     <ListItem sx={{ py: 3, px: 3 }}>
                       <ListItemText
+                        primaryTypographyProps={{ component: 'div' }}
+                        secondaryTypographyProps={{ component: 'div' }}
                         primary={
                           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                             <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
