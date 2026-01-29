@@ -1,30 +1,134 @@
-# BLAKV Hoodie Store
+# 🎽 BLAKV Hoodie Store
 
-A full-stack e-commerce application for premium hoodies, built with React, Node.js, Express, MongoDB, and real-time Socket.IO support.
+A full-stack e-commerce web application for premium hoodies built with React, Node.js, Express, and MongoDB.
 
-![BLAKV Store](https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=800&q=80)
+---
 
-## 🚀 Tech Stack
+## 🌐 Live Demo
+
+| Service              | URL                                                                                    |
+| -------------------- | -------------------------------------------------------------------------------------- |
+| **Frontend**         | [https://hoodie-store-project.netlify.app](https://hoodie-store-project.netlify.app)   |
+| **Backend API**      | [https://hw01-7bba.onrender.com/api](https://hw01-7bba.onrender.com/api)               |
+| **API Health Check** | [https://hw01-7bba.onrender.com/api/health](https://hw01-7bba.onrender.com/api/health) |
+
+---
+
+## 🔐 Test Accounts
+
+| Role            | Email                  | Password        | Access                 |
+| --------------- | ---------------------- | --------------- | ---------------------- |
+| **Super Admin** | `superadmin@blakv.com` | `superadmin123` | Full system control    |
+| **Admin**       | `admin@blakv.com`      | `admin123`      | Products, Orders, Chat |
+| **User**        | `john@example.com`     | `password123`   | Shop, Orders, Profile  |
+
+---
+
+## 📚 Table of Contents
+
+1. [Architecture Overview](#-architecture-overview)
+2. [Tech Stack](#-tech-stack)
+3. [Project Structure](#-project-structure)
+4. [Frontend](#-frontend)
+5. [Backend](#-backend)
+6. [Database](#-database)
+7. [API Documentation](#-api-documentation)
+8. [Custom Hooks](#-custom-hooks)
+9. [Context Providers](#-context-providers)
+10. [Redux Store](#-redux-store)
+11. [Authentication Flow](#-authentication-flow)
+12. [Real-Time Features](#-real-time-features)
+13. [Setup & Installation](#-setup--installation)
+14. [Environment Variables](#-environment-variables)
+15. [Deployment](#-deployment)
+
+---
+
+## 🏗 Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         FRONTEND                                │
+│                    (React + Vite + MUI)                        │
+│                    Hosted on: Netlify                          │
+├─────────────────────────────────────────────────────────────────┤
+│  Pages          │  Components      │  State Management         │
+│  ─────────────  │  ─────────────   │  ───────────────────      │
+│  • Home         │  • Navbar        │  • Redux (Cart)           │
+│  • Products     │  • Footer        │  • Context (Auth)         │
+│  • Cart         │  • HoodieCard    │  • Context (Notifications)│
+│  • Checkout     │  • LoadingSpinner│  • Context (Socket)       │
+│  • Login/Reg    │  • ErrorMessage  │  • Local State (useState) │
+│  • Admin        │  • ProtectedRoute│                           │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │
+                            │ HTTP/REST API + WebSocket
+                            │ (fetch + socket.io-client)
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                          BACKEND                                │
+│               (Node.js + Express + Socket.IO)                  │
+│                    Hosted on: Render                           │
+├─────────────────────────────────────────────────────────────────┤
+│  Routes         │  Controllers     │  Middleware               │
+│  ─────────────  │  ─────────────   │  ────────────             │
+│  • /auth        │  • authController│  • protect (JWT)          │
+│  • /products    │  • productCtrl   │  • admin (role check)     │
+│  • /orders      │  • orderController│ • validate (express-val) │
+│  • /chat        │  • chatController│  • errorHandler           │
+│  • /users       │  (in routes)     │                           │
+│  • /external    │                  │                           │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │
+                            │ Mongoose ODM
+                            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                         DATABASE                                │
+│                    (MongoDB Atlas)                              │
+├─────────────────────────────────────────────────────────────────┤
+│  Collections:                                                   │
+│  • users      - User accounts with roles                       │
+│  • products   - Hoodie products                                │
+│  • orders     - Customer orders                                │
+│  • chats      - Support conversations                          │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🛠 Tech Stack
 
 ### Frontend
 
-- **React 19** - UI library with hooks
-- **Redux Toolkit** - State management (cart)
-- **React Router v7** - Client-side routing
-- **Material UI v7** - Component library
-- **Socket.IO Client** - Real-time communication
-- **Vite** - Build tool & dev server
+| Technology            | Purpose                 |
+| --------------------- | ----------------------- |
+| **React 19**          | UI library              |
+| **Vite**              | Build tool & dev server |
+| **Material UI (MUI)** | Component library       |
+| **React Router v7**   | Client-side routing     |
+| **Redux Toolkit**     | Global state (cart)     |
+| **Socket.IO Client**  | Real-time communication |
 
 ### Backend
 
-- **Node.js** - Runtime environment
-- **Express.js** - Web framework
-- **MongoDB** - NoSQL database
-- **Mongoose** - MongoDB ODM
-- **Socket.IO** - Real-time bidirectional communication
-- **JWT** - Authentication tokens
-- **bcryptjs** - Password hashing
-- **express-validator** - Input validation
+| Technology            | Purpose               |
+| --------------------- | --------------------- |
+| **Node.js**           | Runtime environment   |
+| **Express.js**        | Web framework         |
+| **Socket.IO**         | Real-time WebSockets  |
+| **JWT**               | Authentication tokens |
+| **bcryptjs**          | Password hashing      |
+| **express-validator** | Request validation    |
+
+### Database & Cloud
+
+| Technology        | Purpose          |
+| ----------------- | ---------------- |
+| **MongoDB Atlas** | Cloud database   |
+| **Mongoose**      | MongoDB ODM      |
+| **Cloudinary**    | Image hosting    |
+| **Netlify**       | Frontend hosting |
+| **Render**        | Backend hosting  |
 
 ---
 
@@ -32,286 +136,457 @@ A full-stack e-commerce application for premium hoodies, built with React, Node.
 
 ```
 HW01/
-├── src/                          # React Frontend
-│   ├── components/               # Reusable UI components
-│   │   ├── common/               # Shared components
-│   │   │   ├── ProtectedRoute.jsx
-│   │   │   └── ...
-│   │   ├── chat/                 # Chat feature components
-│   │   │   └── ChatWidget.jsx
-│   │   ├── Navbar.jsx            # Main navigation bar
-│   │   ├── AdminNavbar.jsx       # Admin-only navigation
-│   │   ├── Footer.jsx            # Site footer
-│   │   ├── HoodieCard.jsx        # Product card component
-│   │   └── GlobalSocketListener.jsx
-│   ├── pages/                    # Route page components
-│   │   ├── Home.jsx              # Landing page
-│   │   ├── Products.jsx          # Product catalog
-│   │   ├── ExternalData.jsx      # External API demo
-│   │   ├── Cart.jsx              # Shopping cart
-│   │   ├── Checkout.jsx          # Checkout process
-│   │   ├── Contact.jsx           # Contact form
-│   │   ├── Login.jsx             # User login
-│   │   ├── Register.jsx          # User registration
-│   │   ├── Profile.jsx           # User profile
-│   │   ├── Admin.jsx             # Admin dashboard
-│   │   ├── Support.jsx           # Customer support chat
-│   │   └── NotFound.jsx          # 404 page
-│   ├── hooks/                    # Custom React hooks
-│   │   ├── useLocalStorage.js    # Persistent localStorage state
-│   │   ├── useApi.js             # Data fetching with states
-│   │   ├── useForm.js            # Form handling & validation
-│   │   └── useCloudinaryUpload.js # Image upload to Cloudinary
-│   ├── context/                  # React Context providers
-│   │   ├── AuthContext.jsx       # Authentication state
+├── 📁 src/                      # Frontend source code
+│   ├── 📁 components/           # Reusable UI components
+│   │   ├── 📁 common/           # Shared components
+│   │   │   ├── EmptyState.jsx   # Empty list placeholder
+│   │   │   ├── ErrorMessage.jsx # Error display with retry
+│   │   │   ├── LoadingSpinner.jsx # Loading indicator
+│   │   │   └── ProtectedRoute.jsx # Auth route wrapper
+│   │   ├── 📁 chat/             # Chat components
+│   │   │   └── ChatWidget.jsx   # Floating chat widget
+│   │   ├── AdminNavbar.jsx      # Admin panel navigation
+│   │   ├── Footer.jsx           # Site footer
+│   │   ├── GlobalSocketListener.jsx # Socket event handler
+│   │   ├── HoodieCard.jsx       # Product card
+│   │   └── Navbar.jsx           # Main navigation
+│   │
+│   ├── 📁 context/              # React Context providers
+│   │   ├── AuthContext.jsx      # Authentication state
 │   │   ├── NotificationContext.jsx # Toast notifications
-│   │   └── SocketContext.jsx     # Socket.IO connection
-│   ├── store/                    # Redux store
-│   │   ├── store.js              # Store configuration
-│   │   └── cartSlice.js          # Cart state management
-│   ├── services/                 # API service layer
-│   │   └── api.js                # Centralized API calls
-│   ├── utils/                    # Utility functions
-│   │   └── validators.js         # Form validation rules
-│   ├── App.jsx                   # Main app component
-│   ├── main.jsx                  # React entry point
-│   └── theme.js                  # MUI theme configuration
-├── server/                       # Node.js Backend
-│   ├── config/                   # Configuration
-│   │   └── db.js                 # MongoDB connection
-│   ├── controllers/              # Route handlers
-│   │   ├── authController.js     # Auth logic
-│   │   ├── productController.js  # Product CRUD
-│   │   ├── orderController.js    # Order management
-│   │   └── chatController.js     # Chat functionality
-│   ├── middleware/               # Express middleware
-│   │   ├── auth.js               # JWT verification
-│   │   ├── validate.js           # Input validation
-│   │   └── errorHandler.js       # Error handling
-│   ├── models/                   # MongoDB schemas
-│   │   ├── User.js               # User model
-│   │   ├── Product.js            # Product model
-│   │   ├── Order.js              # Order model
-│   │   └── Chat.js               # Chat model
-│   ├── routes/                   # API route definitions
-│   │   ├── auth.js               # Auth routes
-│   │   ├── products.js           # Product routes
-│   │   ├── orders.js             # Order routes
-│   │   ├── chat.js               # Chat routes
-│   │   ├── users.js              # User management routes
-│   │   └── external.js           # External API routes
-│   ├── seed.js                   # Database seeder
-│   └── server.js                 # Server entry point
-├── public/                       # Static assets
-├── package.json                  # Frontend dependencies
-└── README.md
+│   │   └── SocketContext.jsx    # WebSocket connection
+│   │
+│   ├── 📁 hooks/                # Custom React hooks
+│   │   ├── useApi.js            # Data fetching hook
+│   │   ├── useCloudinaryUpload.js # Image upload hook
+│   │   ├── useForm.js           # Form handling hook
+│   │   └── useLocalStorage.js   # LocalStorage sync hook
+│   │
+│   ├── 📁 pages/                # Page components (routes)
+│   │   ├── Admin.jsx            # Admin dashboard
+│   │   ├── Cart.jsx             # Shopping cart
+│   │   ├── Checkout.jsx         # Order checkout
+│   │   ├── Contact.jsx          # Contact form
+│   │   ├── ExternalData.jsx     # External API demo
+│   │   ├── Home.jsx             # Homepage
+│   │   ├── Login.jsx            # User login
+│   │   ├── NotFound.jsx         # 404 page
+│   │   ├── Products.jsx         # Product catalog
+│   │   ├── Profile.jsx          # User profile
+│   │   ├── Register.jsx         # User registration
+│   │   └── Support.jsx          # Support chat
+│   │
+│   ├── 📁 store/                # Redux store
+│   │   ├── index.js             # Store configuration
+│   │   └── cartSlice.js         # Cart state slice
+│   │
+│   ├── 📁 services/             # API service layer
+│   │   └── api.js               # Centralized API calls
+│   │
+│   ├── 📁 utils/                # Utility functions
+│   │   └── validators.js        # Form validation rules
+│   │
+│   ├── App.jsx                  # Root component with routes
+│   ├── main.jsx                 # React entry point
+│   └── theme.js                 # MUI theme configuration
+│
+├── 📁 server/                   # Backend source code
+│   ├── 📁 config/
+│   │   └── db.js                # MongoDB connection
+│   │
+│   ├── 📁 controllers/          # Request handlers
+│   │   ├── authController.js    # Auth logic
+│   │   ├── chatController.js    # Chat logic
+│   │   ├── orderController.js   # Order logic
+│   │   └── productController.js # Product logic
+│   │
+│   ├── 📁 middleware/           # Express middleware
+│   │   ├── auth.js              # JWT verification
+│   │   ├── errorHandler.js      # Global error handler
+│   │   └── validate.js          # Validation handler
+│   │
+│   ├── 📁 models/               # Mongoose schemas
+│   │   ├── Chat.js              # Chat model
+│   │   ├── Order.js             # Order model
+│   │   ├── Product.js           # Product model
+│   │   └── User.js              # User model
+│   │
+│   ├── 📁 routes/               # API route definitions
+│   │   ├── auth.js              # Auth routes
+│   │   ├── chat.js              # Chat routes
+│   │   ├── external.js          # External data routes
+│   │   ├── orders.js            # Order routes
+│   │   ├── products.js          # Product routes
+│   │   └── users.js             # User management routes
+│   │
+│   ├── seed.js                  # Database seeder
+│   └── server.js                # Express app entry
+│
+├── 📁 public/                   # Static files
+│   └── _redirects               # Netlify SPA routing
+│
+├── .env.example                 # Frontend env template
+├── netlify.toml                 # Netlify configuration
+├── render.yaml                  # Render configuration
+├── package.json                 # Frontend dependencies
+└── README.md                    # This file
 ```
 
 ---
 
-## 🛠️ Setup Instructions
+## 🖥 Frontend
 
-### Prerequisites
+### Pages
 
-- Node.js 18+
-- MongoDB (local or [MongoDB Atlas](https://www.mongodb.com/atlas))
+| Page              | Route       | Description                                                | Auth Required      |
+| ----------------- | ----------- | ---------------------------------------------------------- | ------------------ |
+| **Home**          | `/`         | Landing page with hero, featured products, recently viewed | No                 |
+| **Products**      | `/products` | Full product catalog with search, filter, sort             | No                 |
+| **External Data** | `/api`      | Demo of external API data fetching                         | No                 |
+| **Cart**          | `/cart`     | Shopping cart with quantities                              | No                 |
+| **Checkout**      | `/checkout` | Order form with shipping address                           | No (guest allowed) |
+| **Login**         | `/login`    | User authentication                                        | No                 |
+| **Register**      | `/register` | New account creation                                       | No                 |
+| **Profile**       | `/profile`  | User profile management                                    | Yes                |
+| **Support**       | `/support`  | Real-time chat with admin                                  | Yes                |
+| **Admin**         | `/admin`    | Admin dashboard (products, orders, users, chats)           | Yes (Admin)        |
+| **Not Found**     | `*`         | 404 error page                                             | No                 |
 
-### 1. Clone the Repository
+### How Pages Work
 
-```bash
-git clone <your-repo-url>
-cd HW01
-```
+#### Home Page (`/`)
 
-### 2. Server Setup
+1. Uses `useApi` hook to fetch products from `/api/products`
+2. Filters products into "Featured" and "Latest Drops"
+3. Uses `useLocalStorage` to track "Recently Viewed" items
+4. Dispatches `addItem` to Redux when adding to cart
 
-```bash
-cd server
-npm install
-```
+#### Products Page (`/products`)
 
-Create `.env` file (or copy from `.env.example`):
+1. Fetches products with filters (category, sort, search)
+2. Uses debounced search (500ms delay)
+3. Shows `LoadingSpinner`, `ErrorMessage`, or `EmptyState` based on state
+4. Each `HoodieCard` can add items to Redux cart
 
-```env
-PORT=5000
-MONGODB_URI=mongodb://localhost:27017/blakv
-JWT_SECRET=your-super-secret-jwt-key
-JWT_EXPIRE=7d
-```
+#### Cart Page (`/cart`)
 
-**For MongoDB Atlas:**
+1. Uses `useSelector` to read cart items from Redux
+2. Uses `useDispatch` to update quantities or remove items
+3. Calculates totals and shows order summary
+4. Links to checkout for authenticated or guest users
 
-```env
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/blakv
-```
+#### Checkout Page (`/checkout`)
 
-### 3. Seed Database (Optional but Recommended)
+1. Uses `useForm` hook for form handling
+2. Validates shipping address with `shippingValidator`
+3. For logged-in users: POSTs to `/api/orders`
+4. For guests: POSTs to `/api/orders/guest`
+5. Clears cart on successful order
 
-This creates an admin user and 10 sample products:
+#### Admin Page (`/admin`)
 
-```bash
-npm run seed
-```
-
-**Test Accounts:**
-| Role | Email | Password |
-|------|-------|----------|
-| SuperAdmin | admin@blakv.com | admin123 |
-| User | john@example.com | password123 |
-
-### 4. Start Server
-
-```bash
-npm run dev
-```
-
-Server runs at: `http://localhost:5000`
-
-### 5. Client Setup
-
-Open a new terminal:
-
-```bash
-# From project root (HW01/)
-npm install
-```
-
-Create `.env` file:
-
-```env
-VITE_API_URL=http://localhost:5000/api
-```
-
-### 6. Start Client
-
-```bash
-npm run dev
-```
-
-Client runs at: `http://localhost:5173`
+1. Protected by `ProtectedRoute` with `adminOnly={true}`
+2. Tabs: Products, Orders, Users (superadmin), Chats
+3. CRUD operations for products with `useCloudinaryUpload`
+4. Real-time chat with Socket.IO
 
 ---
 
-## 📱 Features
+## ⚙️ Backend
 
-### User Features
+### Routes Overview
 
-- ✅ Browse hoodie products with filtering
-- ✅ Search products by name/description
-- ✅ Add/remove items from cart
-- ✅ User registration & login
-- ✅ Place orders (authenticated & guest)
-- ✅ View order history
-- ✅ Real-time support chat
-- ✅ Dark/Light theme toggle
+| Route Group | Base Path       | Purpose                      |
+| ----------- | --------------- | ---------------------------- |
+| Auth        | `/api/auth`     | Login, Register, Profile     |
+| Products    | `/api/products` | Product CRUD                 |
+| Orders      | `/api/orders`   | Order management             |
+| Chat        | `/api/chat`     | Support messaging            |
+| Users       | `/api/users`    | User management (SuperAdmin) |
+| External    | `/api/external` | External API demos           |
 
-### Admin Features
-
-- ✅ Product management (Create, Read, Update, Delete)
-- ✅ View and manage all orders
-- ✅ Update order status
-- ✅ Real-time chat with customers
-- ✅ User management (SuperAdmin only)
-
----
-
-## 🔌 API Endpoints
-
-### Auth (`/api/auth`)
-
-| Method | Endpoint    | Description         | Auth Required |
-| ------ | ----------- | ------------------- | ------------- |
-| POST   | `/register` | Register new user   | No            |
-| POST   | `/login`    | Login user          | No            |
-| GET    | `/me`       | Get current user    | Yes           |
-| PUT    | `/profile`  | Update user profile | Yes           |
-
-### Products (`/api/products`)
-
-| Method | Endpoint | Description        | Auth Required |
-| ------ | -------- | ------------------ | ------------- |
-| GET    | `/`      | Get all products   | No            |
-| GET    | `/:id`   | Get single product | No            |
-| POST   | `/`      | Create product     | Admin         |
-| PUT    | `/:id`   | Update product     | Admin         |
-| DELETE | `/:id`   | Delete product     | Admin         |
-
-### Orders (`/api/orders`)
-
-| Method | Endpoint      | Description         | Auth Required |
-| ------ | ------------- | ------------------- | ------------- |
-| GET    | `/`           | Get user's orders   | Yes           |
-| GET    | `/:id`        | Get single order    | Yes           |
-| POST   | `/`           | Create order        | Yes           |
-| POST   | `/guest`      | Create guest order  | No            |
-| GET    | `/admin/all`  | Get all orders      | Admin         |
-| PUT    | `/:id/status` | Update order status | Admin         |
-
-### Chat (`/api/chat`)
-
-| Method | Endpoint       | Description         | Auth Required |
-| ------ | -------------- | ------------------- | ------------- |
-| GET    | `/`            | Get user's chats    | Yes           |
-| POST   | `/`            | Create new chat     | Yes           |
-| GET    | `/:id`         | Get single chat     | Yes           |
-| POST   | `/:id/message` | Add message to chat | Yes           |
-| GET    | `/admin/all`   | Get all chats       | Admin         |
-| PUT    | `/:id/status`  | Update chat status  | Admin         |
-
-### Users (`/api/users`) - SuperAdmin Only
-
-| Method | Endpoint    | Description       | Auth Required |
-| ------ | ----------- | ----------------- | ------------- |
-| GET    | `/`         | Get all users     | SuperAdmin    |
-| POST   | `/admin`    | Create admin user | SuperAdmin    |
-| PUT    | `/:id/role` | Update user role  | SuperAdmin    |
-| DELETE | `/:id`      | Delete user       | SuperAdmin    |
-
-### External (`/api/external`)
-
-| Method | Endpoint      | Description                 | Auth Required |
-| ------ | ------------- | --------------------------- | ------------- |
-| GET    | `/weather`    | Get weather data (demo)     | No            |
-| GET    | `/currencies` | Get currency exchange rates | No            |
-| GET    | `/github`     | Get GitHub repository info  | No            |
-
-### Health Check
-
-| Method | Endpoint      | Description         |
-| ------ | ------------- | ------------------- |
-| GET    | `/api/health` | Server health check |
-
----
-
-## 🎣 Custom Hooks
-
-### useLocalStorage
-
-Syncs React state with localStorage for persistence across sessions.
+### Middleware Stack
 
 ```javascript
-const [value, setValue] = useLocalStorage("key", initialValue);
+app.use(cors({ origin: allowedOrigins, credentials: true }));
+app.use(express.json());
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+}); // Socket.IO
 ```
 
-**Used for:** Theme preference, cart data
-
----
-
-### useApi
-
-Handles data fetching with loading, error, and refetch states.
+### Authentication Middleware
 
 ```javascript
-const { data, loading, error, refetch } = useApi(url, options);
-```
+// protect - Requires valid JWT token
+export const protect = async (req, res, next) => {
+  // 1. Extract token from Authorization header
+  // 2. Verify with jwt.verify()
+  // 3. Attach user to req.user
+};
 
-**Used for:** Product listing, order history
+// admin - Requires admin or superadmin role
+export const admin = (req, res, next) => {
+  if (req.user.role === "admin" || req.user.role === "superadmin") next();
+};
+
+// superAdmin - Requires superadmin role only
+export const superAdmin = (req, res, next) => {
+  if (req.user.role === "superadmin") next();
+};
+```
 
 ---
 
-### useForm
+## 🗄 Database
 
-Complete form handling with validation, touched states, and submission.
+### Models
+
+#### User Model
+
+```javascript
+{
+  name: String (required, min 2 chars),
+  email: String (required, unique, valid email),
+  password: String (required, min 6 chars, hashed),
+  role: 'user' | 'admin' | 'superadmin',
+  isAdmin: Boolean (derived from role),
+  createdAt: Date
+}
+```
+
+**Features:**
+
+- Password auto-hashed with bcrypt before save
+- `comparePassword()` method for login
+- `isAdmin` computed from role
+
+#### Product Model
+
+```javascript
+{
+  name: String (required, max 100),
+  description: String (required, max 500),
+  price: Number (required, >= 0),
+  image: String (required, valid URL),
+  category: 'pullover' | 'zip-up' | 'oversized' | 'premium' | 'limited',
+  stock: Number (default 0),
+  featured: Boolean (default false),
+  createdAt: Date
+}
+```
+
+#### Order Model
+
+```javascript
+{
+  user: ObjectId (ref: User, optional for guests),
+  items: [{
+    product: ObjectId,
+    name: String,
+    image: String,
+    price: Number,
+    quantity: Number
+  }],
+  shippingAddress: {
+    fullName: String,
+    address: String,
+    city: String,
+    postalCode: String,
+    country: String,
+    phone: String (optional)
+  },
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled',
+  totalPrice: Number,
+  discount: Number,
+  guestEmail: String (for guest orders),
+  isGuest: Boolean,
+  createdAt: Date
+}
+```
+
+#### Chat Model
+
+```javascript
+{
+  user: ObjectId (ref: User),
+  subject: String (max 100),
+  messages: [{
+    sender: ObjectId (ref: User),
+    senderName: String,
+    content: String (max 1000),
+    isAdmin: Boolean,
+    createdAt: Date
+  }],
+  status: 'open' | 'in-progress' | 'closed',
+  createdAt: Date
+}
+```
+
+---
+
+## 📡 API Documentation
+
+### Authentication APIs
+
+| Method | Endpoint             | Description              | Auth |
+| ------ | -------------------- | ------------------------ | ---- |
+| POST   | `/api/auth/register` | Create new user account  | No   |
+| POST   | `/api/auth/login`    | Login and get JWT token  | No   |
+| GET    | `/api/auth/me`       | Get current user profile | Yes  |
+| PUT    | `/api/auth/profile`  | Update user profile      | Yes  |
+
+#### Register
+
+```http
+POST /api/auth/register
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "user": { "id": "...", "name": "John Doe", "email": "...", "role": "user" },
+    "token": "eyJhbGciOiJIUzI1NiIs..."
+  }
+}
+```
+
+#### Login
+
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
+
+---
+
+### Product APIs
+
+| Method | Endpoint            | Description                     | Auth  |
+| ------ | ------------------- | ------------------------------- | ----- |
+| GET    | `/api/products`     | Get all products (with filters) | No    |
+| GET    | `/api/products/:id` | Get single product              | No    |
+| POST   | `/api/products`     | Create product                  | Admin |
+| PUT    | `/api/products/:id` | Update product                  | Admin |
+| DELETE | `/api/products/:id` | Delete product                  | Admin |
+
+#### Query Parameters (GET /products)
+
+| Param      | Example     | Description                |
+| ---------- | ----------- | -------------------------- |
+| `category` | `pullover`  | Filter by category         |
+| `sort`     | `price-asc` | Sort order                 |
+| `search`   | `black`     | Search in name/description |
+
+---
+
+### Order APIs
+
+| Method | Endpoint                 | Description                   | Auth  |
+| ------ | ------------------------ | ----------------------------- | ----- |
+| POST   | `/api/orders`            | Create order (logged in user) | Yes   |
+| POST   | `/api/orders/guest`      | Create guest order            | No    |
+| GET    | `/api/orders`            | Get my orders                 | Yes   |
+| GET    | `/api/orders/:id`        | Get single order              | Yes   |
+| GET    | `/api/orders/admin/all`  | Get all orders                | Admin |
+| PUT    | `/api/orders/:id/status` | Update order status           | Admin |
+
+---
+
+### Chat APIs
+
+| Method | Endpoint                | Description            | Auth  |
+| ------ | ----------------------- | ---------------------- | ----- |
+| POST   | `/api/chat`             | Create new chat        | Yes   |
+| GET    | `/api/chat`             | Get my chats           | Yes   |
+| GET    | `/api/chat/:id`         | Get chat with messages | Yes   |
+| POST   | `/api/chat/:id/message` | Add message to chat    | Yes   |
+| GET    | `/api/chat/admin/all`   | Get all chats          | Admin |
+| PUT    | `/api/chat/:id/status`  | Update chat status     | Admin |
+
+---
+
+### User Management APIs (SuperAdmin Only)
+
+| Method | Endpoint              | Description       | Auth       |
+| ------ | --------------------- | ----------------- | ---------- |
+| GET    | `/api/users`          | Get all users     | SuperAdmin |
+| POST   | `/api/users/admin`    | Create admin user | SuperAdmin |
+| PUT    | `/api/users/:id/role` | Change user role  | SuperAdmin |
+| DELETE | `/api/users/:id`      | Delete user       | SuperAdmin |
+
+---
+
+### External APIs (Demo/Mock)
+
+| Method | Endpoint                   | Description                |
+| ------ | -------------------------- | -------------------------- |
+| GET    | `/api/external/scrape`     | Get sample hoodie products |
+| GET    | `/api/external/weather`    | Get mock weather data      |
+| GET    | `/api/external/currencies` | Get mock currency rates    |
+| GET    | `/api/external/github`     | Get mock GitHub info       |
+
+---
+
+## 🪝 Custom Hooks
+
+### `useLocalStorage(key, initialValue)`
+
+Syncs React state with localStorage for persistence.
+
+```javascript
+const [theme, setTheme] = useLocalStorage("theme", "dark");
+```
+
+**Used In:**
+
+- `App.jsx` - Theme persistence
+- `Home.jsx` - Recently viewed products
+
+---
+
+### `useApi(url, options)`
+
+Fetches data from API with loading/error states.
+
+```javascript
+const { data, loading, error, refetch } = useApi("/api/products");
+```
+
+**Returns:**
+| Property | Type | Description |
+|----------|------|-------------|
+| `data` | any | Response data |
+| `loading` | boolean | Loading state |
+| `error` | string | Error message |
+| `refetch` | function | Re-fetch data |
+
+**Used In:**
+
+- `Home.jsx` - Fetch products
+- `ExternalData.jsx` - Fetch external hoodies
+
+---
+
+### `useForm(initialValues, validate, onSubmit)`
+
+Handles form state, validation, and submission.
 
 ```javascript
 const {
@@ -322,28 +597,43 @@ const {
   handleChange,
   handleBlur,
   handleSubmit,
-  setFieldValue,
-  setFieldError,
-  resetForm,
-} = useForm(initialValues, validationFunction, onSubmitHandler);
+} = useForm({ email: "", password: "" }, loginValidator, handleLogin);
 ```
 
-**Used for:** Login, Register, Checkout, Contact forms
+**Features:**
+
+- Controlled input handling
+- Blur validation
+- Server error mapping
+- Submit state management
+
+**Used In:**
+
+- `Login.jsx`, `Register.jsx`, `Contact.jsx`, `Checkout.jsx`
 
 ---
 
-### useCloudinaryUpload
+### `useCloudinaryUpload()`
 
-Handles image uploads to Cloudinary with progress tracking.
+Uploads images to Cloudinary with progress tracking.
 
 ```javascript
-const { upload, uploading, progress, error, url } = useCloudinaryUpload();
+const { uploadImage, uploading, progress, error } = useCloudinaryUpload();
 
-// Usage
-const imageUrl = await upload(file);
+const url = await uploadImage(file);
 ```
 
-**Used for:** Product image uploads in admin panel
+**Returns:**
+| Property | Type | Description |
+|----------|------|-------------|
+| `uploadImage` | function | Upload file, returns URL |
+| `uploading` | boolean | Upload in progress |
+| `progress` | number | 0-100 percent |
+| `error` | string | Error message |
+
+**Used In:**
+
+- `Admin.jsx` - Product image upload
 
 ---
 
@@ -351,236 +641,306 @@ const imageUrl = await upload(file);
 
 ### AuthContext
 
-Manages authentication state throughout the app.
+Manages user authentication state globally.
 
 ```javascript
-const {
-  user, // Current user object
-  loading, // Auth loading state
-  error, // Auth error
-  isAuthenticated, // Boolean - logged in?
-  isAdmin, // Boolean - admin role?
-  isSuperAdmin, // Boolean - superadmin role?
-  role, // 'user' | 'admin' | 'superadmin'
-  register, // Register function
-  login, // Login function
-  logout, // Logout function
-  updateProfile, // Update profile function
-} = useAuth();
+const { user, isAuthenticated, isAdmin, login, logout, loading } = useAuth();
 ```
+
+**State:**
+| Property | Type | Description |
+|----------|------|-------------|
+| `user` | object | Current user data |
+| `isAuthenticated` | boolean | Login status |
+| `isAdmin` | boolean | Admin check |
+| `loading` | boolean | Auth check in progress |
+
+**Methods:**
+| Method | Parameters | Description |
+|--------|------------|-------------|
+| `login` | credentials | Authenticate user |
+| `logout` | - | Clear auth state |
+| `register` | userData | Create account |
+
+**Token Storage:** JWT stored in `localStorage` as `token`
 
 ---
 
 ### NotificationContext
 
-Provides toast notifications throughout the app.
+Global toast notification system.
 
 ```javascript
-const {
-  notifySuccess, // (message, title?) => void
-  notifyError, // (message, title?) => void
-  notifyWarning, // (message, title?) => void
-  notifyInfo, // (message, title?) => void
-} = useNotification();
+const { notifySuccess, notifyError, notifyInfo, notifyWarning } =
+  useNotification();
+
+notifySuccess("Item added!", "Cart Updated");
 ```
+
+**Methods:**
+| Method | Parameters | Description |
+|--------|------------|-------------|
+| `notifySuccess` | (message, title) | Green success toast |
+| `notifyError` | (message, title) | Red error toast |
+| `notifyInfo` | (message, title) | Blue info toast |
+| `notifyWarning` | (message, title) | Orange warning toast |
 
 ---
 
 ### SocketContext
 
-Manages Socket.IO connection for real-time features.
+WebSocket connection for real-time features.
 
 ```javascript
-const { socket, connected } = useSocket();
+const socket = useSocket();
 
-// Emit events
-socket.emit('join_chat', chatId);
-
-// Listen for events
 socket.on('new_message', (data) => { ... });
+socket.emit('join_chat', chatId);
+```
+
+**Connection:**
+
+- Connects when user logs in
+- Disconnects on logout
+- Auto-joins user room for notifications
+
+---
+
+## 🛒 Redux Store
+
+### Cart Slice
+
+**State Shape:**
+
+```javascript
+{
+  cart: {
+    items: [
+      { id, name, price, image, quantity }
+    ],
+    totalCount: number,
+    lastUpdated: string (ISO date)
+  }
+}
+```
+
+**Actions:**
+| Action | Payload | Description |
+|--------|---------|-------------|
+| `addItem` | product object | Add/increment item |
+| `removeItem` | productId | Remove item |
+| `updateQuantity` | { id, quantity } | Set quantity |
+| `clearCart` | - | Empty cart |
+
+**Selectors:**
+
+```javascript
+import { selectCartItems, selectCartCount } from "../store/cartSlice";
+
+const items = useSelector(selectCartItems);
+const count = useSelector(selectCartCount);
+```
+
+**Persistence:**
+Cart auto-saves to localStorage via middleware.
+
+---
+
+## 🔐 Authentication Flow
+
+```
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│   Frontend   │     │   Backend    │     │   Database   │
+└──────┬───────┘     └──────┬───────┘     └──────┬───────┘
+       │                    │                    │
+       │  POST /auth/login  │                    │
+       │  {email, password} │                    │
+       │───────────────────>│                    │
+       │                    │  Find user by email│
+       │                    │───────────────────>│
+       │                    │    User document   │
+       │                    │<───────────────────│
+       │                    │                    │
+       │                    │ Compare password   │
+       │                    │ (bcrypt)           │
+       │                    │                    │
+       │                    │ Generate JWT       │
+       │                    │ (7 days expiry)    │
+       │                    │                    │
+       │  {user, token}     │                    │
+       │<───────────────────│                    │
+       │                    │                    │
+       │ Store token in     │                    │
+       │ localStorage       │                    │
+       │                    │                    │
+       │  GET /products     │                    │
+       │  Authorization:    │                    │
+       │  Bearer <token>    │                    │
+       │───────────────────>│                    │
+       │                    │ Verify JWT         │
+       │                    │ Attach user to req │
+       │                    │                    │
+       │  {products}        │                    │
+       │<───────────────────│                    │
 ```
 
 ---
 
-## 🔄 Real-Time Features (Socket.IO)
+## ⚡ Real-Time Features
 
-The app uses Socket.IO for real-time bidirectional communication:
+### Socket.IO Events
 
-### Socket Events
+**Client → Server:**
+| Event | Data | Description |
+|-------|------|-------------|
+| `join_chat` | chatId | Join chat room |
+| `leave_chat` | chatId | Leave chat room |
+| `join_user` | userId | Join user notification room |
 
-| Event           | Direction       | Description               |
-| --------------- | --------------- | ------------------------- |
-| `join_chat`     | Client → Server | Join a chat room          |
-| `leave_chat`    | Client → Server | Leave a chat room         |
-| `join_user`     | Client → Server | Join user-specific room   |
-| `new_message`   | Server → Client | New chat message received |
-| `chat_updated`  | Server → Client | Chat status changed       |
-| `order_updated` | Server → Client | Order status changed      |
+**Server → Client:**
+| Event | Data | Description |
+|-------|------|-------------|
+| `new_message` | message object | New chat message |
+| `chat_status_updated` | { chatId, status } | Status change |
 
-### Usage Flow
+### How Real-Time Chat Works
 
-1. **Connection**: Socket connects automatically when app loads (via SocketProvider)
-2. **User Room**: After login, user joins their personal room for notifications
-3. **Chat Rooms**: When opening a chat, user joins that specific chat room
-4. **Real-time Updates**: Messages and status changes broadcast to all room members
-
----
-
-## 📦 Page Descriptions
-
-| Page             | Route       | Description                                                       |
-| ---------------- | ----------- | ----------------------------------------------------------------- |
-| **Home**         | `/`         | Landing page with hero banner, featured products, and brand story |
-| **Products**     | `/products` | Full product catalog with search, filter by category              |
-| **ExternalData** | `/api`      | Demo page showing external API integration                        |
-| **Cart**         | `/cart`     | Shopping cart with quantity controls and totals                   |
-| **Checkout**     | `/checkout` | Order form with shipping details and payment                      |
-| **Contact**      | `/contact`  | Contact form for general inquiries                                |
-| **Login**        | `/login`    | User authentication form                                          |
-| **Register**     | `/register` | New user registration form                                        |
-| **Profile**      | `/profile`  | User profile with order history (protected)                       |
-| **Support**      | `/support`  | Real-time chat with customer support (protected)                  |
-| **Admin**        | `/admin`    | Admin dashboard for products, orders, chats, users                |
-| **NotFound**     | `*`         | 404 error page                                                    |
+1. User opens Support page → `socket.emit('join_chat', chatId)`
+2. User sends message → POST to `/api/chat/:id/message`
+3. Server saves message → `io.to(chatId).emit('new_message', message)`
+4. All connected users in that chat receive the message instantly
 
 ---
 
-## 🔒 Validation
+## 🚀 Setup & Installation
 
-### Client-Side
+### Prerequisites
 
-- Required field validation
-- Email format validation
-- Password minimum length (6 characters)
-- Password confirmation matching
-- Real-time validation on blur
+- Node.js 18+
+- MongoDB (local or Atlas)
+- npm or yarn
 
-### Server-Side
-
-- express-validator middleware
-- Input sanitization
-- Mongoose schema validation
-- Meaningful error messages with field identification
-
----
-
-## 🧪 Error Handling
-
-- Loading spinners during async operations
-- Error messages with retry options
-- Empty state displays for no data
-- Form validation errors with field highlighting
-- Server error handling with user-friendly messages
-- 404 page for unknown routes
-- Global error boundary for React errors
-
----
-
-## 📦 Environment Variables
-
-### Server (.env)
-
-```env
-PORT=5000
-MONGODB_URI=mongodb://localhost:27017/blakv
-JWT_SECRET=your-secret-key
-JWT_EXPIRE=7d
-```
-
-### Client (.env)
-
-```env
-VITE_API_URL=http://localhost:5000/api
-VITE_CLOUDINARY_URL=your-cloudinary-url (optional)
-```
-
----
-
-## 🚀 Running in Production
-
-### Build Client
+### Clone Repository
 
 ```bash
-npm run build
+git clone https://github.com/AtheerAzaizeh/HW01.git
+cd HW01
 ```
 
-Output will be in `dist/` folder.
+### Install Dependencies
 
-### Start Server
+```bash
+# Frontend
+npm install
+
+# Backend
+cd server
+npm install
+```
+
+### Setup Environment Variables
+
+```bash
+# Frontend - copy and edit
+cp .env.example .env
+
+# Backend - copy and edit
+cp server/.env.example server/.env
+```
+
+### Seed Database
 
 ```bash
 cd server
-NODE_ENV=production npm start
+npm run seed
+```
+
+### Run Development Servers
+
+```bash
+# Terminal 1 - Backend
+cd server
+npm run dev
+
+# Terminal 2 - Frontend
+npm run dev
+```
+
+### Access Application
+
+- Frontend: https://hoodie-store-project.netlify.app
+- Backend: https://hw01-7bba.onrender.com/api
+
+---
+
+## 🔧 Environment Variables
+
+### Frontend (`.env`)
+
+```env
+# API URL (local or production)
+VITE_API_URL=https://hw01-7bba.onrender.com/api
+
+# Cloudinary (for image uploads)
+VITE_CLOUDINARY_CLOUD_NAME=your-cloud-name
+VITE_CLOUDINARY_UPLOAD_PRESET=your-preset
+```
+
+### Backend (`server/.env`)
+
+```env
+# Server port
+PORT=5000
+
+# MongoDB connection string
+MONGODB_URI=mongodb://localhost:27017/blakv
+
+# JWT configuration
+JWT_SECRET=your-super-secret-key
+JWT_EXPIRE=7d
+
+# CORS - Frontend URL (for production)
+FRONTEND_URL=https://hoodie-store-project.netlify.app
 ```
 
 ---
 
-## 🏗️ Architecture Overview
+## ☁️ Deployment
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        FRONTEND                              │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
-│  │   Pages     │  │  Components │  │   Hooks     │          │
-│  │  (12 pages) │  │  (10+ UI)   │  │  (4 custom) │          │
-│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘          │
-│         │                │                │                  │
-│  ┌──────┴────────────────┴────────────────┴──────┐          │
-│  │              Context Providers                 │          │
-│  │  (Auth, Notification, Socket)                 │          │
-│  └────────────────────────┬──────────────────────┘          │
-│                           │                                  │
-│  ┌────────────────────────┴──────────────────────┐          │
-│  │              API Service Layer                 │          │
-│  │         (Centralized fetch wrapper)           │          │
-│  └────────────────────────┬──────────────────────┘          │
-└───────────────────────────┼──────────────────────────────────┘
-                            │
-                    HTTP / WebSocket
-                            │
-┌───────────────────────────┼──────────────────────────────────┐
-│                        BACKEND                               │
-│  ┌────────────────────────┴──────────────────────┐          │
-│  │              Express + Socket.IO               │          │
-│  └────────────────────────┬──────────────────────┘          │
-│                           │                                  │
-│  ┌──────────┐  ┌──────────┴───────┐  ┌──────────┐          │
-│  │  Routes  │──│   Controllers    │──│Middleware│          │
-│  │(6 groups)│  │  (Business Logic)│  │(Auth,Err)│          │
-│  └──────────┘  └──────────┬───────┘  └──────────┘          │
-│                           │                                  │
-│  ┌────────────────────────┴──────────────────────┐          │
-│  │              Mongoose Models                   │          │
-│  │      (User, Product, Order, Chat)             │          │
-│  └────────────────────────┬──────────────────────┘          │
-└───────────────────────────┼──────────────────────────────────┘
-                            │
-                    ┌───────┴───────┐
-                    │   MongoDB     │
-                    │   Database    │
-                    └───────────────┘
-```
+### MongoDB Atlas
 
-### Data Flow
+1. Create free cluster at [mongodb.com/atlas](https://mongodb.com/atlas)
+2. Add database user with password
+3. Whitelist IP `0.0.0.0/0`
+4. Get connection string
 
-1. **User Action** → React Component
-2. **Component** → Calls API service or dispatches Redux action
-3. **API Service** → Makes HTTP request with JWT token
-4. **Express Server** → Routes to appropriate controller
-5. **Controller** → Validates, processes, interacts with MongoDB
-6. **Response** → Returns to frontend
-7. **Context/Redux** → Updates state
-8. **Component** → Re-renders with new data
+### Backend on Render
 
-### Real-Time Flow
+1. Create Web Service at [render.com](https://render.com)
+2. Connect GitHub repository
+3. Set root directory: `server`
+4. Build command: `npm install`
+5. Start command: `npm start`
+6. Add environment variables (MONGODB_URI, JWT_SECRET, FRONTEND_URL)
 
-1. **Client connects** → Socket.IO establishes WebSocket connection
-2. **User action** (e.g., sends message) → API call to server
-3. **Server** → Saves to database, emits Socket event
-4. **All connected clients** → Receive event, update UI instantly
+### Frontend on Netlify
+
+1. Create site at [netlify.com](https://netlify.com)
+2. Connect GitHub repository
+3. Build command: `npm run build`
+4. Publish directory: `dist`
+5. Add environment variable: `VITE_API_URL , VITE_CLOUDINARY_CLOUD_NAME , VITE_CLOUDINARY_UPLOAD_PRESET`
 
 ---
 
 ## 📝 License
 
-MIT
+This project was created for the React Course Final Project.
+
+---
+
+## 👤 Author
+
+**Atheer Azaizeh**
+
+- GitHub: [@AtheerAzaizeh](https://github.com/AtheerAzaizeh)
