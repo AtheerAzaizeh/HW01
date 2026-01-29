@@ -161,8 +161,13 @@ const Support = () => {
       {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
 
       <Box sx={{ display: 'flex', gap: 3, height: '60vh' }}>
-        {/* Chat List */}
-        <Paper sx={{ width: 300, overflow: 'auto', bgcolor: 'background.paper' }}>
+        {/* Chat List - Hidden on mobile if chat selected */}
+        <Paper sx={{ 
+          width: { xs: '100%', md: 300 }, 
+          display: { xs: selectedChat ? 'none' : 'block', md: 'block' },
+          overflow: 'auto', 
+          bgcolor: 'background.paper' 
+        }}>
           <Typography variant="h6" sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
             Your Tickets
           </Typography>
@@ -199,13 +204,30 @@ const Support = () => {
           )}
         </Paper>
 
-        {/* Chat Messages */}
-        <Paper sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', bgcolor: 'background.paper' }}>
+        {/* Chat Messages - Hidden on mobile if no chat selected */}
+        <Paper sx={{ 
+          flexGrow: 1, 
+          display: { xs: selectedChat ? 'flex' : 'none', md: 'flex' },
+          flexDirection: 'column', 
+          bgcolor: 'background.paper' 
+        }}>
           {selectedChat ? (
             <>
-              <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
-                <Typography variant="h6">{selectedChat.subject}</Typography>
-                <Chip label={selectedChat.status} size="small" color={getStatusColor(selectedChat.status)} />
+              <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider', display: 'flex', alignItems: 'center', gap: 1 }}>
+                {/* Back button for mobile */}
+                <Button 
+                  size="small" 
+                  onClick={() => setSelectedChat(null)} 
+                  sx={{ display: { xs: 'block', md: 'none' }, minWidth: 'auto', mr: 1 }}
+                >
+                  ← Back
+                </Button>
+                <Box sx={{ flexGrow: 1 }}>
+                  <Typography variant="h6" sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
+                    {selectedChat.subject}
+                  </Typography>
+                  <Chip label={selectedChat.status} size="small" color={getStatusColor(selectedChat.status)} sx={{ mt: 0.5 }} />
+                </Box>
               </Box>
               
               {/* Messages */}

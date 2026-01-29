@@ -5,7 +5,7 @@ import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   Button, IconButton, Chip, Dialog, DialogTitle, DialogContent,
   DialogActions, TextField, MenuItem, Alert, Snackbar, 
-  LinearProgress, Avatar, useMediaQuery, useTheme
+  LinearProgress, Avatar, useMediaQuery, useTheme, Fab, Divider, Stack
 } from '@mui/material';
 import {
   Inventory, ShoppingCart, People, Chat as ChatIcon,
@@ -278,45 +278,80 @@ const Admin = () => {
         {/* PRODUCTS TAB */}
         <TabPanel value={tab} index={0}>
           <Box sx={{ p: { xs: 2, sm: 3 } }}>
-            <Button 
-              variant="contained" 
-              startIcon={<Add />}
-              onClick={() => openProductDialog()}
-              sx={{ mb: 3, bgcolor: '#FFD700', color: 'black' }}
-              fullWidth={isMobile}
-            >
-              Add Product
-            </Button>
+            {isMobile ? (
+              <Fab 
+                color="primary" 
+                aria-label="add" 
+                onClick={() => openProductDialog()}
+                sx={{ position: 'fixed', bottom: 24, right: 24, bgcolor: '#FFD700', color: 'black', zIndex: 1000 }}
+              >
+                <Add />
+              </Fab>
+            ) : (
+              <Button 
+                variant="contained" 
+                startIcon={<Add />}
+                onClick={() => openProductDialog()}
+                sx={{ mb: 3, bgcolor: '#FFD700', color: 'black' }}
+              >
+                Add Product
+              </Button>
+            )}
 
             {/* Mobile Card Layout */}
             {isMobile ? (
-              <Grid container spacing={2}>
+              <Stack spacing={2}>
                 {products.map((product) => (
-                  <Grid item xs={12} key={product._id}>
-                    <Card sx={{ bgcolor: 'background.paper' }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', p: 2 }}>
-                        <Avatar src={product.image} variant="rounded" sx={{ width: 60, height: 60, mr: 2 }} />
-                        <Box sx={{ flex: 1 }}>
-                          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{product.name}</Typography>
-                          <Typography variant="body2" color="text.secondary">${product.price} • Stock: {product.stock}</Typography>
-                          <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5 }}>
-                            <Chip label={product.category} size="small" />
-                            {product.featured && <Chip label="⭐ Featured" size="small" color="warning" />}
-                          </Box>
+                  <Card key={product._id} sx={{ bgcolor: 'background.paper', borderRadius: 2 }}>
+                    {/* Product Content */}
+                    <Box sx={{ display: 'flex', p: 2, alignItems: 'center' }}>
+                      <Avatar 
+                        src={product.image} 
+                        variant="rounded" 
+                        sx={{ width: 70, height: 70, mr: 2, bgcolor: 'grey.200' }} 
+                      />
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
+                          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', noWrap: true, mr: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {product.name}
+                          </Typography>
+                          {product.featured && <Chip label="★" size="small" color="warning" sx={{ height: 20, minWidth: 20, '& .MuiChip-label': { px: 0.5 } }} />}
                         </Box>
-                        <Box>
-                          <IconButton size="small" onClick={() => openProductDialog(product)}><Edit /></IconButton>
-                          <IconButton size="small" color="error" onClick={() => handleDeleteProduct(product._id)}><Delete /></IconButton>
-                        </Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                          ${product.price} • Stock: <strong>{product.stock}</strong>
+                        </Typography>
+                        <Chip label={product.category} size="small" variant="outlined" sx={{ height: 24 }} />
                       </Box>
-                    </Card>
-                  </Grid>
+                    </Box>
+                    
+                    {/* Mobile Actions - Full width buttons */}
+                    <Divider />
+                    <Box sx={{ display: 'flex' }}>
+                      <Button 
+                        fullWidth 
+                        startIcon={<Edit />} 
+                        onClick={() => openProductDialog(product)}
+                        sx={{ py: 1.5, borderRadius: 0, borderRight: '1px solid rgba(0,0,0,0.1)' }}
+                      >
+                        Edit
+                      </Button>
+                      <Button 
+                        fullWidth 
+                        startIcon={<Delete />} 
+                        color="error" 
+                        onClick={() => handleDeleteProduct(product._id)}
+                        sx={{ py: 1.5, borderRadius: 0 }}
+                      >
+                        Delete
+                      </Button>
+                    </Box>
+                  </Card>
                 ))}
-              </Grid>
+              </Stack>
             ) : (
               /* Desktop Table Layout */
-              <TableContainer>
-                <Table>
+              <TableContainer component={Paper} sx={{ boxShadow: 'none', border: '1px solid', borderColor: 'divider' }}>
+                <Table size="medium">
                   <TableHead>
                     <TableRow>
                       <TableCell>Image</TableCell>
@@ -325,22 +360,27 @@ const Admin = () => {
                       <TableCell>Category</TableCell>
                       <TableCell>Stock</TableCell>
                       <TableCell>Featured</TableCell>
-                      <TableCell>Actions</TableCell>
+                      <TableCell align="right">Actions</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {products.map((product) => (
-                      <TableRow key={product._id}>
+                      <TableRow key={product._id} hover>
                         <TableCell>
                           <Avatar src={product.image} variant="rounded" sx={{ width: 50, height: 50 }} />
                         </TableCell>
-                        <TableCell>{product.name}</TableCell>
+                        <TableCell sx={{ fontWeight: 'medium' }}>{product.name}</TableCell>
                         <TableCell>${product.price}</TableCell>
-                        <TableCell><Chip label={product.category} size="small" /></TableCell>
-                        <TableCell>{product.stock}</TableCell>
-                        <TableCell>{product.featured ? '⭐' : '-'}</TableCell>
+                        <TableCell><Chip label={product.category} size="small" variant="outlined" /></TableCell>
                         <TableCell>
-                          <IconButton onClick={() => openProductDialog(product)}><Edit /></IconButton>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            {product.stock}
+                            {product.stock < 5 && <Chip label="Low" color="error" size="small" sx={{ height: 20, fontSize: '0.625rem' }} />}
+                          </Box>
+                        </TableCell>
+                        <TableCell>{product.featured ? '⭐' : '-'}</TableCell>
+                        <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
+                          <IconButton onClick={() => openProductDialog(product)} color="primary"><Edit /></IconButton>
                           <IconButton color="error" onClick={() => handleDeleteProduct(product._id)}><Delete /></IconButton>
                         </TableCell>
                       </TableRow>
@@ -357,50 +397,62 @@ const Admin = () => {
           <Box sx={{ p: { xs: 2, sm: 3 } }}>
             {/* Mobile Card Layout */}
             {isMobile ? (
-              <Grid container spacing={2}>
+              <Stack spacing={2}>
                 {orders.map((order) => (
-                  <Grid item xs={12} key={order._id}>
-                    <Card sx={{ bgcolor: 'background.paper' }}>
-                      <Box sx={{ p: 2 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                  <Card key={order._id} sx={{ bgcolor: 'background.paper', borderRadius: 2 }}>
+                    <Box sx={{ p: 2 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                        <Box>
+                          <Typography variant="h6" sx={{ fontWeight: 'bold', fontFamily: 'monospace' }}>
                             #{order._id.slice(-6).toUpperCase()}
                           </Typography>
-                          <Chip 
-                            label={order.status} 
-                            color={order.status === 'delivered' ? 'success' : 'warning'}
-                            size="small"
-                          />
+                          <Typography variant="body2" color="text.secondary">
+                            {new Date(order.createdAt).toLocaleDateString()}
+                          </Typography>
                         </Box>
-                        <Typography variant="body2" color="text.secondary">
-                          {order.user?.name || 'Guest'} • {order.items?.length || 0} items
-                        </Typography>
-                        <Typography variant="h6" sx={{ color: '#FFD700', mt: 1 }}>
-                          ${order.totalPrice?.toFixed(2)}
-                        </Typography>
-                        <TextField
-                          select
+                        <Chip 
+                          label={order.status} 
+                          color={order.status === 'delivered' ? 'success' : 'warning'}
                           size="small"
-                          value={order.status}
-                          onChange={(e) => handleOrderStatus(order._id, e.target.value)}
-                          fullWidth
-                          sx={{ mt: 2 }}
-                          label="Update Status"
-                        >
-                          <MenuItem value="pending">Pending</MenuItem>
-                          <MenuItem value="processing">Processing</MenuItem>
-                          <MenuItem value="shipped">Shipped</MenuItem>
-                          <MenuItem value="delivered">Delivered</MenuItem>
-                          <MenuItem value="cancelled">Cancelled</MenuItem>
-                        </TextField>
+                          sx={{ fontWeight: 'bold' }}
+                        />
                       </Box>
-                    </Card>
-                  </Grid>
+                      
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, bgcolor: 'background.default', p: 1.5, borderRadius: 1 }}>
+                        <Box>
+                          <Typography variant="caption" color="text.secondary" display="block">CUSTOMER</Typography>
+                          <Typography variant="body2" fontWeight="medium">{order.user?.name || 'Guest'}</Typography>
+                        </Box>
+                        <Box sx={{ textAlign: 'right' }}>
+                          <Typography variant="caption" color="text.secondary" display="block">TOTAL</Typography>
+                          <Typography variant="body1" fontWeight="bold" color="primary.main">
+                            ${order.totalPrice?.toFixed(2)}
+                          </Typography>
+                        </Box>
+                      </Box>
+
+                      <TextField
+                        select
+                        size="small"
+                        value={order.status}
+                        onChange={(e) => handleOrderStatus(order._id, e.target.value)}
+                        fullWidth
+                        label="Update Order Status"
+                        variant="outlined"
+                      >
+                        <MenuItem value="pending">Pending</MenuItem>
+                        <MenuItem value="processing">Processing</MenuItem>
+                        <MenuItem value="shipped">Shipped</MenuItem>
+                        <MenuItem value="delivered">Delivered</MenuItem>
+                        <MenuItem value="cancelled">Cancelled</MenuItem>
+                      </TextField>
+                    </Box>
+                  </Card>
                 ))}
-              </Grid>
+              </Stack>
             ) : (
               /* Desktop Table Layout */
-              <TableContainer>
+              <TableContainer component={Paper} sx={{ boxShadow: 'none', border: '1px solid', borderColor: 'divider' }}>
                 <Table>
                   <TableHead>
                     <TableRow>
@@ -409,30 +461,34 @@ const Admin = () => {
                       <TableCell>Items</TableCell>
                       <TableCell>Total</TableCell>
                       <TableCell>Status</TableCell>
-                      <TableCell>Actions</TableCell>
+                      <TableCell align="right">Actions</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {orders.map((order) => (
-                      <TableRow key={order._id}>
-                        <TableCell>#{order._id.slice(-6).toUpperCase()}</TableCell>
+                      <TableRow key={order._id} hover>
+                        <TableCell sx={{ fontFamily: 'monospace', fontWeight: 'bold' }}>
+                          #{order._id.slice(-6).toUpperCase()}
+                        </TableCell>
                         <TableCell>{order.user?.name || 'Guest'}</TableCell>
                         <TableCell>{order.items?.length || 0} items</TableCell>
-                        <TableCell>${order.totalPrice?.toFixed(2)}</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>${order.totalPrice?.toFixed(2)}</TableCell>
                         <TableCell>
                           <Chip 
                             label={order.status} 
                             color={order.status === 'delivered' ? 'success' : 'warning'}
                             size="small"
+                            variant="outlined"
                           />
                         </TableCell>
-                        <TableCell>
+                        <TableCell align="right">
                           <TextField
                             select
                             size="small"
                             value={order.status}
                             onChange={(e) => handleOrderStatus(order._id, e.target.value)}
-                            sx={{ minWidth: 120 }}
+                            sx={{ minWidth: 140 }}
+                            variant="outlined"
                           >
                             <MenuItem value="pending">Pending</MenuItem>
                             <MenuItem value="processing">Processing</MenuItem>
@@ -460,39 +516,37 @@ const Admin = () => {
               </Box>
             ) : isMobile ? (
               /* Mobile Card Layout */
-              <Grid container spacing={2}>
+              <Stack spacing={2}>
                 {chats.map((chat) => (
-                  <Grid item xs={12} key={chat._id}>
-                    <Card sx={{ bgcolor: 'background.paper' }}>
-                      <Box sx={{ p: 2 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                            {chat.subject}
-                          </Typography>
-                          <Chip 
-                            label={chat.status} 
-                            color={chat.status === 'closed' ? 'success' : chat.status === 'in-progress' ? 'info' : 'warning'}
-                            size="small"
-                          />
-                        </Box>
-                        <Typography variant="body2" color="text.secondary">
-                          {chat.user?.name || 'N/A'} • {chat.messages?.length || 0} messages
+                  <Card key={chat._id} sx={{ bgcolor: 'background.paper' }}>
+                    <Box sx={{ p: 2 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                          {chat.subject}
                         </Typography>
-                        <Button
-                          variant="outlined"
+                        <Chip 
+                          label={chat.status} 
+                          color={chat.status === 'closed' ? 'success' : chat.status === 'in-progress' ? 'info' : 'warning'}
                           size="small"
-                          startIcon={<Visibility />}
-                          onClick={() => { setChatDialog({ open: true, chat }); setReplyMessage(''); }}
-                          sx={{ mt: 2 }}
-                          fullWidth
-                        >
-                          View Chat
-                        </Button>
+                        />
                       </Box>
-                    </Card>
-                  </Grid>
+                      <Typography variant="body2" color="text.secondary">
+                        {chat.user?.name || 'N/A'} • {chat.messages?.length || 0} messages
+                      </Typography>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        startIcon={<Visibility />}
+                        onClick={() => { setChatDialog({ open: true, chat }); setReplyMessage(''); }}
+                        sx={{ mt: 2 }}
+                        fullWidth
+                      >
+                        View Chat
+                      </Button>
+                    </Box>
+                  </Card>
                 ))}
-              </Grid>
+              </Stack>
             ) : (
               /* Desktop Table Layout */
               <TableContainer>
@@ -537,57 +591,70 @@ const Admin = () => {
         {isSuperAdmin && (
           <TabPanel value={tab} index={3}>
             <Box sx={{ p: { xs: 2, sm: 3 } }}>
-              <Button 
-                variant="contained" 
-                startIcon={<Add />}
-                onClick={() => setAdminDialog(true)}
-                sx={{ mb: 3, bgcolor: '#FFD700', color: 'black' }}
-                fullWidth={isMobile}
-              >
-                Create Admin
-              </Button>
+              {isMobile ? (
+                <Fab 
+                  color="primary" 
+                  aria-label="add" 
+                  onClick={() => setAdminDialog(true)}
+                  sx={{ position: 'fixed', bottom: 24, right: 24, bgcolor: '#FFD700', color: 'black', zIndex: 1000 }}
+                >
+                  <Add />
+                </Fab>
+              ) : (
+                <Button 
+                  variant="contained" 
+                  startIcon={<Add />}
+                  onClick={() => setAdminDialog(true)}
+                  sx={{ mb: 3, bgcolor: '#FFD700', color: 'black' }}
+                >
+                  Create Admin
+                </Button>
+              )}
 
               {/* Mobile Card Layout */}
               {isMobile ? (
-                <Grid container spacing={2}>
+                <Stack spacing={2}>
                   {users.map((u) => (
-                    <Grid item xs={12} key={u._id}>
-                      <Card sx={{ bgcolor: 'background.paper' }}>
-                        <Box sx={{ p: 2 }}>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                    <Card key={u._id} sx={{ bgcolor: 'background.paper', borderRadius: 2 }}>
+                      <Box sx={{ p: 2 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                          <Box>
                             <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
                               {u.name}
                             </Typography>
-                            <Chip 
-                              label={u.role} 
-                              color={u.role === 'superadmin' ? 'error' : u.role === 'admin' ? 'warning' : 'default'}
-                              size="small"
-                            />
+                            <Typography variant="body2" color="text.secondary" sx={{ wordBreak: 'break-all' }}>
+                              {u.email}
+                            </Typography>
                           </Box>
-                          <Typography variant="body2" color="text.secondary">
-                            {u.email}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            Joined: {new Date(u.createdAt).toLocaleDateString()}
-                          </Typography>
-                          {u.role !== 'superadmin' && u._id !== user.id && (
-                            <Button
-                              variant="outlined"
-                              color="error"
-                              size="small"
-                              startIcon={<Delete />}
-                              onClick={() => handleDeleteUser(u._id)}
-                              sx={{ mt: 2 }}
-                              fullWidth
-                            >
-                              Delete User
-                            </Button>
-                          )}
+                          <Chip 
+                            label={u.role} 
+                            color={u.role === 'superadmin' ? 'error' : u.role === 'admin' ? 'warning' : 'default'}
+                            size="small"
+                          />
                         </Box>
-                      </Card>
-                    </Grid>
+                        
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+                          Joined: {new Date(u.createdAt).toLocaleDateString()}
+                        </Typography>
+                      </Box>
+                      
+                      {u.role !== 'superadmin' && u._id !== user.id && (
+                        <>
+                          <Divider />
+                          <Button
+                            color="error"
+                            fullWidth
+                            startIcon={<Delete />}
+                            onClick={() => handleDeleteUser(u._id)}
+                            sx={{ py: 1.5, borderRadius: 0 }}
+                          >
+                            Delete User
+                          </Button>
+                        </>
+                      )}
+                    </Card>
                   ))}
-                </Grid>
+                </Stack>
               ) : (
                 /* Desktop Table Layout */
                 <TableContainer>
@@ -720,11 +787,18 @@ const Admin = () => {
           <span>Chat: {chatDialog.chat?.subject}</span>
           <Chip label={chatDialog.chat?.status} size="small" color={chatDialog.chat?.status === 'open' ? 'warning' : 'info'} />
         </DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ p: { xs: 2, md: 3 } }}>
           <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
             User: {chatDialog.chat?.user?.name} ({chatDialog.chat?.user?.email})
           </Typography>
-          <Box sx={{ maxHeight: 350, overflow: 'auto', py: 2, bgcolor: 'background.default', borderRadius: 2, p: 2 }}>
+          <Box sx={{ 
+            maxHeight: 350, 
+            overflow: 'auto', 
+            py: 2, 
+            bgcolor: 'background.default', 
+            borderRadius: 2, 
+            p: 2 
+          }}>
             {chatDialog.chat?.messages?.map((msg, i) => (
               <Box 
                 key={i} 
@@ -736,17 +810,17 @@ const Admin = () => {
               >
                 <Box
                   sx={{
-                    maxWidth: '70%',
+                    maxWidth: { xs: '85%', sm: '70%' },
                     p: 2,
                     bgcolor: msg.isAdminReply ? '#FFD700' : 'background.paper',
                     color: msg.isAdminReply ? 'black' : 'text.primary',
                     borderRadius: 2
                   }}
                 >
-                  <Typography variant="caption" sx={{ opacity: 0.7 }}>
+                  <Typography variant="caption" sx={{ opacity: 0.7, display: 'block', mb: 0.5 }}>
                     {msg.isAdminReply ? 'You' : chatDialog.chat?.user?.name} • {new Date(msg.createdAt).toLocaleString()}
                   </Typography>
-                  <Typography>{msg.content}</Typography>
+                  <Typography sx={{ wordBreak: 'break-word' }}>{msg.content}</Typography>
                 </Box>
               </Box>
             ))}
@@ -754,20 +828,21 @@ const Admin = () => {
           
           {/* Reply Input */}
           {chatDialog.chat?.status !== 'closed' && (
-            <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1, mt: 2 }}>
               <TextField
                 fullWidth
                 placeholder="Type your reply..."
                 value={replyMessage}
                 onChange={(e) => setReplyMessage(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleReplyToChat()}
+                size="small"
               />
               <Button
                 variant="contained"
                 startIcon={<Reply />}
                 onClick={handleReplyToChat}
                 disabled={!replyMessage.trim()}
-                sx={{ bgcolor: '#FFD700', color: 'black' }}
+                sx={{ bgcolor: '#FFD700', color: 'black', whiteSpace: 'nowrap' }}
               >
                 Reply
               </Button>

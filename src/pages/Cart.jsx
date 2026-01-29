@@ -85,9 +85,54 @@ const Cart = () => {
                     {cartItems.map((item, index) => (
                         <React.Fragment key={`${item.id}-${index}`}>
                             <ListItem
-                                secondaryAction={
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        {/* Quantity Controls */}
+                                disableGutters
+                                sx={{ 
+                                    p: 3,
+                                    flexDirection: { xs: 'column', sm: 'row' },
+                                    alignItems: { xs: 'flex-start', sm: 'center' },
+                                    gap: 2
+                                }}
+                            >
+                                <Box sx={{ display: 'flex', width: '100%', alignItems: 'center' }}>
+                                    <ListItemAvatar sx={{ mr: 2 }}>
+                                        <Avatar
+                                            src={item.image}
+                                            alt={item.name || item.title}
+                                            variant="rounded"
+                                            sx={{ width: 80, height: 80, bgcolor: 'white' }}
+                                        />
+                                    </ListItemAvatar>
+                                    <ListItemText
+                                        primary={
+                                            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                                                {item.name || item.title}
+                                            </Typography>
+                                        }
+                                        secondary={
+                                            <Box>
+                                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                                    ${item.price} × {item.quantity || 1}
+                                                </Typography>
+                                                <Typography variant="body1" sx={{ color: 'secondary.main', mt: 0.5, fontWeight: 'bold' }}>
+                                                    ${(parseFloat(item.price) * (item.quantity || 1)).toFixed(2)}
+                                                </Typography>
+                                            </Box>
+                                        }
+                                        secondaryTypographyProps={{ component: 'div' }}
+                                    />
+                                </Box>
+
+                                <Box sx={{ 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    width: { xs: '100%', sm: 'auto' },
+                                    justifyContent: { xs: 'space-between', sm: 'flex-end' },
+                                    gap: 1,
+                                    mt: { xs: 2, sm: 0 },
+                                    borderTop: { xs: '1px solid rgba(255,255,255,0.05)', sm: 'none' },
+                                    pt: { xs: 2, sm: 0 }
+                                }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: 'background.default', borderRadius: 1 }}>
                                         <IconButton 
                                             size="small" 
                                             onClick={() => handleQuantityChange(item.id, -1)}
@@ -95,7 +140,7 @@ const Cart = () => {
                                         >
                                             <RemoveIcon fontSize="small" />
                                         </IconButton>
-                                        <Typography sx={{ minWidth: 24, textAlign: 'center' }}>
+                                        <Typography sx={{ minWidth: 30, textAlign: 'center', fontWeight: 'bold' }}>
                                             {item.quantity || 1}
                                         </Typography>
                                         <IconButton 
@@ -105,45 +150,18 @@ const Cart = () => {
                                         >
                                             <AddIcon fontSize="small" />
                                         </IconButton>
-                                        {/* Delete Button */}
-                                        <IconButton 
-                                            edge="end" 
-                                            aria-label="delete" 
-                                            onClick={() => handleRemoveItem(item)} 
-                                            color="error"
-                                            sx={{ ml: 2 }}
-                                        >
-                                            <DeleteIcon />
-                                        </IconButton>
                                     </Box>
-                                }
-                                sx={{ p: 3 }}
-                            >
-                                <ListItemAvatar sx={{ mr: 2 }}>
-                                    <Avatar
-                                        src={item.image}
-                                        alt={item.name || item.title}
-                                        variant="rounded"
-                                        sx={{ width: 80, height: 80, bgcolor: 'white' }}
-                                    />
-                                </ListItemAvatar>
-                                <ListItemText
-                                    primary={
-                                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                                            {item.name || item.title}
-                                        </Typography>
-                                    }
-                                    secondary={
-                                        <Box>
-                                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                                ${item.price} × {item.quantity || 1}
-                                            </Typography>
-                                            <Typography variant="body1" sx={{ color: 'secondary.main', mt: 0.5, fontWeight: 'bold' }}>
-                                                ${(parseFloat(item.price) * (item.quantity || 1)).toFixed(2)}
-                                            </Typography>
-                                        </Box>
-                                    }
-                                />
+                                    
+                                    <Button 
+                                        startIcon={<DeleteIcon />}
+                                        onClick={() => handleRemoveItem(item)} 
+                                        color="error"
+                                        size="small"
+                                        sx={{ ml: 2 }}
+                                    >
+                                        Remove
+                                    </Button>
+                                </Box>
                             </ListItem>
                             {index < cartItems.length - 1 && <Divider component="li" />}
                         </React.Fragment>
@@ -151,15 +169,26 @@ const Cart = () => {
                 </List>
             </Paper>
 
-            <Box sx={{ mt: 4, p: 3, bgcolor: 'background.paper', borderRadius: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ 
+                mt: 4, 
+                p: 3, 
+                bgcolor: 'background.paper', 
+                borderRadius: 2, 
+                display: 'flex', 
+                flexDirection: { xs: 'column', sm: 'row' },
+                justifyContent: 'space-between', 
+                alignItems: { xs: 'stretch', sm: 'center' },
+                gap: 2
+            }}>
                 <Button 
                     variant="outlined" 
                     color="error" 
                     onClick={() => dispatch(clearCart())}
+                    sx={{ width: { xs: '100%', sm: 'auto' } }}
                 >
                     Clear Cart
                 </Button>
-                <Box sx={{ textAlign: 'right' }}>
+                <Box sx={{ textAlign: { xs: 'center', sm: 'right' } }}>
                     <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
                         Total: ${totalPrice.toFixed(2)}
                     </Typography>
@@ -168,7 +197,14 @@ const Cart = () => {
                         size="large" 
                         component={Link}
                         to="/checkout"
-                        sx={{ mt: 2, px: 6, fontWeight: 'bold', color: 'black', bgcolor: '#FFD700' }}
+                        sx={{ 
+                            mt: 2, 
+                            px: 6, 
+                            fontWeight: 'bold', 
+                            color: 'black', 
+                            bgcolor: '#FFD700',
+                            width: { xs: '100%', sm: 'auto' }
+                        }}
                     >
                         Proceed to Checkout
                     </Button>

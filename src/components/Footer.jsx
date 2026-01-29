@@ -72,7 +72,7 @@ const Footer = () => {
             <Typography variant="body2" sx={{ color: '#888', mb: 2 }}>
               Subscribe for exclusive drops and early access.
             </Typography>
-            <Box component="form" sx={{ display: 'flex', gap: 1 }}>
+            <Box component="form" sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
               <TextField 
                 variant="outlined" 
                 placeholder="Enter your email" 
@@ -81,10 +81,19 @@ const Footer = () => {
                 sx={{ 
                   bgcolor: '#1a1a1a', 
                   input: { color: 'white' },
-                  '& fieldset': { borderColor: '#333' }
+                  '& fieldset': { borderColor: '#333' },
+                  flex: '1 1 200px'
                 }} 
               />
-              <Button variant="contained" color="secondary" sx={{ minWidth: '100px', color: 'black' }}>
+              <Button 
+                variant="contained" 
+                color="secondary" 
+                sx={{ 
+                  minWidth: '100px', 
+                  color: 'black',
+                  flex: { xs: '1 1 100%', sm: '0 0 auto' }
+                }}
+              >
                 Join
               </Button>
             </Box>

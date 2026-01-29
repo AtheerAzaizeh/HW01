@@ -42,11 +42,6 @@ const AdminNavbar = () => {
             >
               BLAKV<span style={{ color: '#FFD700' }}>.</span>
             </Typography>
-            <Chip 
-              label="Admin Panel" 
-              size="small"
-              sx={{ bgcolor: '#FFD700', color: 'black', fontWeight: 'bold' }}
-            />
           </Box>
 
           {/* Admin Info */}
@@ -80,7 +75,6 @@ const AdminNavbar = () => {
                 '&:hover': { borderColor: '#ff6666', bgcolor: 'rgba(255,68,68,0.1)' }
               }}
             >
-              Logout
             </Button>
           </Box>
         </Toolbar>
