@@ -354,40 +354,38 @@ const Admin = () => {
 
         {/* ORDERS TAB */}
         <TabPanel value={tab} index={1}>
-          <Box sx={{ p: 3 }}>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Order ID</TableCell>
-                    <TableCell>Customer</TableCell>
-                    <TableCell>Items</TableCell>
-                    <TableCell>Total</TableCell>
-                    <TableCell>Status</TableCell>
-                    <TableCell>Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {orders.map((order) => (
-                    <TableRow key={order._id}>
-                      <TableCell>#{order._id.slice(-6).toUpperCase()}</TableCell>
-                      <TableCell>{order.user?.name || 'Guest'}</TableCell>
-                      <TableCell>{order.items?.length || 0} items</TableCell>
-                      <TableCell>${order.totalPrice?.toFixed(2)}</TableCell>
-                      <TableCell>
-                        <Chip 
-                          label={order.status} 
-                          color={order.status === 'delivered' ? 'success' : 'warning'}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell>
+          <Box sx={{ p: { xs: 2, sm: 3 } }}>
+            {/* Mobile Card Layout */}
+            {isMobile ? (
+              <Grid container spacing={2}>
+                {orders.map((order) => (
+                  <Grid item xs={12} key={order._id}>
+                    <Card sx={{ bgcolor: 'background.paper' }}>
+                      <Box sx={{ p: 2 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                            #{order._id.slice(-6).toUpperCase()}
+                          </Typography>
+                          <Chip 
+                            label={order.status} 
+                            color={order.status === 'delivered' ? 'success' : 'warning'}
+                            size="small"
+                          />
+                        </Box>
+                        <Typography variant="body2" color="text.secondary">
+                          {order.user?.name || 'Guest'} • {order.items?.length || 0} items
+                        </Typography>
+                        <Typography variant="h6" sx={{ color: '#FFD700', mt: 1 }}>
+                          ${order.totalPrice?.toFixed(2)}
+                        </Typography>
                         <TextField
                           select
                           size="small"
                           value={order.status}
                           onChange={(e) => handleOrderStatus(order._id, e.target.value)}
-                          sx={{ minWidth: 120 }}
+                          fullWidth
+                          sx={{ mt: 2 }}
+                          label="Update Status"
                         >
                           <MenuItem value="pending">Pending</MenuItem>
                           <MenuItem value="processing">Processing</MenuItem>
@@ -395,24 +393,108 @@ const Admin = () => {
                           <MenuItem value="delivered">Delivered</MenuItem>
                           <MenuItem value="cancelled">Cancelled</MenuItem>
                         </TextField>
-                      </TableCell>
+                      </Box>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            ) : (
+              /* Desktop Table Layout */
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Order ID</TableCell>
+                      <TableCell>Customer</TableCell>
+                      <TableCell>Items</TableCell>
+                      <TableCell>Total</TableCell>
+                      <TableCell>Status</TableCell>
+                      <TableCell>Actions</TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                  </TableHead>
+                  <TableBody>
+                    {orders.map((order) => (
+                      <TableRow key={order._id}>
+                        <TableCell>#{order._id.slice(-6).toUpperCase()}</TableCell>
+                        <TableCell>{order.user?.name || 'Guest'}</TableCell>
+                        <TableCell>{order.items?.length || 0} items</TableCell>
+                        <TableCell>${order.totalPrice?.toFixed(2)}</TableCell>
+                        <TableCell>
+                          <Chip 
+                            label={order.status} 
+                            color={order.status === 'delivered' ? 'success' : 'warning'}
+                            size="small"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <TextField
+                            select
+                            size="small"
+                            value={order.status}
+                            onChange={(e) => handleOrderStatus(order._id, e.target.value)}
+                            sx={{ minWidth: 120 }}
+                          >
+                            <MenuItem value="pending">Pending</MenuItem>
+                            <MenuItem value="processing">Processing</MenuItem>
+                            <MenuItem value="shipped">Shipped</MenuItem>
+                            <MenuItem value="delivered">Delivered</MenuItem>
+                            <MenuItem value="cancelled">Cancelled</MenuItem>
+                          </TextField>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
           </Box>
         </TabPanel>
 
         {/* CHAT/SUPPORT TAB */}
         <TabPanel value={tab} index={2}>
-          <Box sx={{ p: 3 }}>
+          <Box sx={{ p: { xs: 2, sm: 3 } }}>
             {chats.length === 0 ? (
               <Box sx={{ textAlign: 'center', py: 4 }}>
                 <ChatIcon sx={{ fontSize: 48, color: 'text.secondary' }} />
                 <Typography color="text.secondary">No support requests</Typography>
               </Box>
+            ) : isMobile ? (
+              /* Mobile Card Layout */
+              <Grid container spacing={2}>
+                {chats.map((chat) => (
+                  <Grid item xs={12} key={chat._id}>
+                    <Card sx={{ bgcolor: 'background.paper' }}>
+                      <Box sx={{ p: 2 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                            {chat.subject}
+                          </Typography>
+                          <Chip 
+                            label={chat.status} 
+                            color={chat.status === 'closed' ? 'success' : chat.status === 'in-progress' ? 'info' : 'warning'}
+                            size="small"
+                          />
+                        </Box>
+                        <Typography variant="body2" color="text.secondary">
+                          {chat.user?.name || 'N/A'} • {chat.messages?.length || 0} messages
+                        </Typography>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          startIcon={<Visibility />}
+                          onClick={() => { setChatDialog({ open: true, chat }); setReplyMessage(''); }}
+                          sx={{ mt: 2 }}
+                          fullWidth
+                        >
+                          View Chat
+                        </Button>
+                      </Box>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
             ) : (
+              /* Desktop Table Layout */
               <TableContainer>
                 <Table>
                   <TableHead>
@@ -454,52 +536,97 @@ const Admin = () => {
         {/* USERS TAB (SuperAdmin only) */}
         {isSuperAdmin && (
           <TabPanel value={tab} index={3}>
-            <Box sx={{ p: 3 }}>
+            <Box sx={{ p: { xs: 2, sm: 3 } }}>
               <Button 
                 variant="contained" 
                 startIcon={<Add />}
                 onClick={() => setAdminDialog(true)}
                 sx={{ mb: 3, bgcolor: '#FFD700', color: 'black' }}
+                fullWidth={isMobile}
               >
                 Create Admin
               </Button>
 
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Name</TableCell>
-                      <TableCell>Email</TableCell>
-                      <TableCell>Role</TableCell>
-                      <TableCell>Joined</TableCell>
-                      <TableCell>Actions</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {users.map((u) => (
-                      <TableRow key={u._id}>
-                        <TableCell>{u.name}</TableCell>
-                        <TableCell>{u.email}</TableCell>
-                        <TableCell>
-                          <Chip 
-                            label={u.role} 
-                            color={u.role === 'superadmin' ? 'error' : u.role === 'admin' ? 'warning' : 'default'}
-                            size="small"
-                          />
-                        </TableCell>
-                        <TableCell>{new Date(u.createdAt).toLocaleDateString()}</TableCell>
-                        <TableCell>
+              {/* Mobile Card Layout */}
+              {isMobile ? (
+                <Grid container spacing={2}>
+                  {users.map((u) => (
+                    <Grid item xs={12} key={u._id}>
+                      <Card sx={{ bgcolor: 'background.paper' }}>
+                        <Box sx={{ p: 2 }}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                              {u.name}
+                            </Typography>
+                            <Chip 
+                              label={u.role} 
+                              color={u.role === 'superadmin' ? 'error' : u.role === 'admin' ? 'warning' : 'default'}
+                              size="small"
+                            />
+                          </Box>
+                          <Typography variant="body2" color="text.secondary">
+                            {u.email}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            Joined: {new Date(u.createdAt).toLocaleDateString()}
+                          </Typography>
                           {u.role !== 'superadmin' && u._id !== user.id && (
-                            <IconButton color="error" onClick={() => handleDeleteUser(u._id)}>
-                              <Delete />
-                            </IconButton>
+                            <Button
+                              variant="outlined"
+                              color="error"
+                              size="small"
+                              startIcon={<Delete />}
+                              onClick={() => handleDeleteUser(u._id)}
+                              sx={{ mt: 2 }}
+                              fullWidth
+                            >
+                              Delete User
+                            </Button>
                           )}
-                        </TableCell>
+                        </Box>
+                      </Card>
+                    </Grid>
+                  ))}
+                </Grid>
+              ) : (
+                /* Desktop Table Layout */
+                <TableContainer>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Name</TableCell>
+                        <TableCell>Email</TableCell>
+                        <TableCell>Role</TableCell>
+                        <TableCell>Joined</TableCell>
+                        <TableCell>Actions</TableCell>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                    </TableHead>
+                    <TableBody>
+                      {users.map((u) => (
+                        <TableRow key={u._id}>
+                          <TableCell>{u.name}</TableCell>
+                          <TableCell>{u.email}</TableCell>
+                          <TableCell>
+                            <Chip 
+                              label={u.role} 
+                              color={u.role === 'superadmin' ? 'error' : u.role === 'admin' ? 'warning' : 'default'}
+                              size="small"
+                            />
+                          </TableCell>
+                          <TableCell>{new Date(u.createdAt).toLocaleDateString()}</TableCell>
+                          <TableCell>
+                            {u.role !== 'superadmin' && u._id !== user.id && (
+                              <IconButton color="error" onClick={() => handleDeleteUser(u._id)}>
+                                <Delete />
+                              </IconButton>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
             </Box>
           </TabPanel>
         )}
