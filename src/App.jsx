@@ -64,11 +64,43 @@ const lightTheme = createTheme({
   },
 });
 
+// Loading screen component
+const LoadingScreen = () => (
+  <Box sx={{ 
+    display: 'flex', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    minHeight: '100vh',
+    bgcolor: 'background.default'
+  }}>
+    <Box sx={{ textAlign: 'center' }}>
+      <Box sx={{ 
+        width: 40, 
+        height: 40, 
+        border: '3px solid',
+        borderColor: 'grey.700',
+        borderTopColor: '#FFD700',
+        borderRadius: '50%',
+        animation: 'spin 1s linear infinite',
+        mx: 'auto',
+        mb: 2,
+        '@keyframes spin': {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' }
+        }
+      }} />
+    </Box>
+  </Box>
+);
+
 // Layout component that conditionally renders navbar
 const AppLayout = ({ children, themeMode, toggleTheme }) => {
   const { isAdmin, loading } = useAuth();
   
-  if (loading) return null;
+  // Handle loading state without early return to maintain hooks order
+  if (loading) {
+    return <LoadingScreen />;
+  }
   
   // Admin sees admin navbar only
   if (isAdmin) {
@@ -99,7 +131,10 @@ const AppLayout = ({ children, themeMode, toggleTheme }) => {
 const AppRoutes = () => {
   const { isAdmin, loading } = useAuth();
   
-  if (loading) return null;
+  // Return null during loading - parent AppLayout handles the loading screen
+  if (loading) {
+    return null;
+  }
 
   // Admin users only see admin panel
   if (isAdmin) {

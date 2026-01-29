@@ -19,10 +19,8 @@ const ChatWidget = () => {
   const messagesEndRef = useRef(null);
   const pollIntervalRef = useRef(null);
 
-  // Don't show for non-authenticated users or admins
-  if (!isAuthenticated || user?.role === 'admin' || user?.role === 'superadmin') {
-    return null;
-  }
+  // Determine if widget should be shown (moved before hooks to use in effects)
+  const shouldShow = isAuthenticated && user?.role !== 'admin' && user?.role !== 'superadmin';
 
   // Scroll to bottom
   const scrollToBottom = () => {
@@ -31,7 +29,7 @@ const ChatWidget = () => {
 
   // Fetch or create chat
   useEffect(() => {
-    if (open && isAuthenticated) {
+    if (shouldShow && open && isAuthenticated) {
       fetchActiveChat();
     }
 
@@ -40,19 +38,21 @@ const ChatWidget = () => {
         clearInterval(pollIntervalRef.current);
       }
     };
-  }, [open, isAuthenticated]);
+  }, [open, isAuthenticated, shouldShow]);
 
   // Poll for new messages
   useEffect(() => {
-    if (activeChat && open) {
+    if (shouldShow && activeChat && open) {
       pollIntervalRef.current = setInterval(fetchMessages, 3000);
       return () => clearInterval(pollIntervalRef.current);
     }
-  }, [activeChat, open]);
+  }, [activeChat, open, shouldShow]);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    if (shouldShow) {
+      scrollToBottom();
+    }
+  }, [messages, shouldShow]);
 
   const fetchActiveChat = async () => {
     setLoading(true);
@@ -87,7 +87,7 @@ const ChatWidget = () => {
           if (Notification.permission === 'granted') {
             new Notification('New message from Support', {
               body: lastMsg.content.substring(0, 50) + '...',
-              icon: '/favicon.ico'
+              icon: '/vite.svg'
             });
           }
         }
@@ -132,6 +132,11 @@ const ChatWidget = () => {
       Notification.requestPermission();
     }
   };
+
+  // Don't render for non-authenticated users or admins - moved AFTER all hooks
+  if (!shouldShow) {
+    return null;
+  }
 
   return (
     <>
